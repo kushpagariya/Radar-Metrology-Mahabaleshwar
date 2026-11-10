@@ -1,0 +1,669 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-10T13:54:27.069667+00:00",
+  "title": "Design System: Radar Metrology — Mahabaleshwar",
+  "extensions": {
+    "colorMeta": {
+      "ink": {
+        "role": "neutral",
+        "displayName": "Deep Green Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0083 192.72)",
+          "oklch(26% 0.0165 192.72)",
+          "oklch(38% 0.0264 192.72)",
+          "oklch(49% 0.0330 192.72)",
+          "oklch(61% 0.0330 192.72)",
+          "oklch(72% 0.0264 192.72)",
+          "oklch(84% 0.0165 192.72)",
+          "oklch(95% 0.0059 192.72)"
+        ]
+      },
+      "body-ink": {
+        "role": "neutral",
+        "displayName": "Body Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0075 192.52)",
+          "oklch(26% 0.0150 192.52)",
+          "oklch(38% 0.0239 192.52)",
+          "oklch(49% 0.0299 192.52)",
+          "oklch(61% 0.0299 192.52)",
+          "oklch(72% 0.0239 192.52)",
+          "oklch(84% 0.0150 192.52)",
+          "oklch(95% 0.0054 192.52)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Green Grey",
+        "tonalRamp": [
+          "oklch(15% 0.0051 174.75)",
+          "oklch(26% 0.0103 174.75)",
+          "oklch(38% 0.0164 174.75)",
+          "oklch(49% 0.0205 174.75)",
+          "oklch(61% 0.0205 174.75)",
+          "oklch(72% 0.0164 174.75)",
+          "oklch(84% 0.0103 174.75)",
+          "oklch(95% 0.0037 174.75)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Instrument Teal",
+        "tonalRamp": [
+          "oklch(15% 0.0160 205.44)",
+          "oklch(26% 0.0320 205.44)",
+          "oklch(38% 0.0512 205.44)",
+          "oklch(49% 0.0640 205.44)",
+          "oklch(61% 0.0640 205.44)",
+          "oklch(72% 0.0512 205.44)",
+          "oklch(84% 0.0320 205.44)",
+          "oklch(95% 0.0115 205.44)"
+        ]
+      },
+      "action": {
+        "role": "primary",
+        "displayName": "Deep Teal Action",
+        "tonalRamp": [
+          "oklch(15% 0.0123 195.33)",
+          "oklch(26% 0.0246 195.33)",
+          "oklch(38% 0.0394 195.33)",
+          "oklch(49% 0.0493 195.33)",
+          "oklch(61% 0.0493 195.33)",
+          "oklch(72% 0.0394 195.33)",
+          "oklch(84% 0.0246 195.33)",
+          "oklch(95% 0.0089 195.33)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Fine Sage Line",
+        "tonalRamp": [
+          "oklch(15% 0.0026 145.49)",
+          "oklch(26% 0.0052 145.49)",
+          "oklch(38% 0.0082 145.49)",
+          "oklch(49% 0.0103 145.49)",
+          "oklch(61% 0.0103 145.49)",
+          "oklch(72% 0.0082 145.49)",
+          "oklch(84% 0.0052 145.49)",
+          "oklch(95% 0.0019 145.49)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Studio Paper",
+        "tonalRamp": [
+          "oklch(15% 0.0010 121.56)",
+          "oklch(26% 0.0020 121.56)",
+          "oklch(38% 0.0033 121.56)",
+          "oklch(49% 0.0041 121.56)",
+          "oklch(61% 0.0041 121.56)",
+          "oklch(72% 0.0033 121.56)",
+          "oklch(84% 0.0020 121.56)",
+          "oklch(95% 0.0007 121.56)"
+        ]
+      },
+      "studio": {
+        "role": "neutral",
+        "displayName": "Studio Ground",
+        "tonalRamp": [
+          "oklch(15% 0.0013 117.92)",
+          "oklch(26% 0.0027 117.92)",
+          "oklch(38% 0.0043 117.92)",
+          "oklch(49% 0.0054 117.92)",
+          "oklch(61% 0.0054 117.92)",
+          "oklch(72% 0.0043 117.92)",
+          "oklch(84% 0.0027 117.92)",
+          "oklch(95% 0.0010 117.92)"
+        ]
+      },
+      "sage-field": {
+        "role": "neutral",
+        "displayName": "Sage Field",
+        "tonalRamp": [
+          "oklch(15% 0.0031 137.79)",
+          "oklch(26% 0.0062 137.79)",
+          "oklch(38% 0.0099 137.79)",
+          "oklch(49% 0.0124 137.79)",
+          "oklch(61% 0.0124 137.79)",
+          "oklch(72% 0.0099 137.79)",
+          "oklch(84% 0.0062 137.79)",
+          "oklch(95% 0.0022 137.79)"
+        ]
+      },
+      "workspace": {
+        "role": "neutral",
+        "displayName": "Research Paper",
+        "tonalRamp": [
+          "oklch(15% 0.0011 134.85)",
+          "oklch(26% 0.0022 134.85)",
+          "oklch(38% 0.0036 134.85)",
+          "oklch(49% 0.0045 134.85)",
+          "oklch(61% 0.0045 134.85)",
+          "oklch(72% 0.0036 134.85)",
+          "oklch(84% 0.0022 134.85)",
+          "oklch(95% 0.0008 134.85)"
+        ]
+      },
+      "sidebar": {
+        "role": "neutral",
+        "displayName": "Navigation Sage",
+        "tonalRamp": [
+          "oklch(15% 0.0021 128.56)",
+          "oklch(26% 0.0043 128.56)",
+          "oklch(38% 0.0068 128.56)",
+          "oklch(49% 0.0085 128.56)",
+          "oklch(61% 0.0085 128.56)",
+          "oklch(72% 0.0068 128.56)",
+          "oklch(84% 0.0043 128.56)",
+          "oklch(95% 0.0015 128.56)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Panel Paper",
+        "tonalRamp": [
+          "oklch(15% 0.0010 121.56)",
+          "oklch(26% 0.0020 121.56)",
+          "oklch(38% 0.0033 121.56)",
+          "oklch(49% 0.0041 121.56)",
+          "oklch(61% 0.0041 121.56)",
+          "oklch(72% 0.0033 121.56)",
+          "oklch(84% 0.0020 121.56)",
+          "oklch(95% 0.0007 121.56)"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "White",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.88)",
+          "oklch(26% 0.0000 89.88)",
+          "oklch(38% 0.0000 89.88)",
+          "oklch(49% 0.0000 89.88)",
+          "oklch(61% 0.0000 89.88)",
+          "oklch(72% 0.0000 89.88)",
+          "oklch(84% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
+        ]
+      },
+      "nav-selected": {
+        "role": "neutral",
+        "displayName": "Selected Sage",
+        "tonalRamp": [
+          "oklch(15% 0.0047 137.80)",
+          "oklch(26% 0.0093 137.80)",
+          "oklch(38% 0.0149 137.80)",
+          "oklch(49% 0.0187 137.80)",
+          "oklch(61% 0.0187 137.80)",
+          "oklch(72% 0.0149 137.80)",
+          "oklch(84% 0.0093 137.80)",
+          "oklch(95% 0.0034 137.80)"
+        ]
+      },
+      "nav-selected-ink": {
+        "role": "neutral",
+        "displayName": "Selected Sage Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0135 170.43)",
+          "oklch(26% 0.0270 170.43)",
+          "oklch(38% 0.0432 170.43)",
+          "oklch(49% 0.0540 170.43)",
+          "oklch(61% 0.0540 170.43)",
+          "oklch(72% 0.0432 170.43)",
+          "oklch(84% 0.0270 170.43)",
+          "oklch(95% 0.0097 170.43)"
+        ]
+      },
+      "focus": {
+        "role": "primary",
+        "displayName": "Focus Teal",
+        "tonalRamp": [
+          "oklch(15% 0.0205 204.91)",
+          "oklch(26% 0.0410 204.91)",
+          "oklch(38% 0.0655 204.91)",
+          "oklch(49% 0.0819 204.91)",
+          "oklch(61% 0.0819 204.91)",
+          "oklch(72% 0.0655 204.91)",
+          "oklch(84% 0.0410 204.91)",
+          "oklch(95% 0.0147 204.91)"
+        ]
+      },
+      "field-focus": {
+        "role": "primary",
+        "displayName": "Field Focus",
+        "tonalRamp": [
+          "oklch(15% 0.0144 191.69)",
+          "oklch(26% 0.0288 191.69)",
+          "oklch(38% 0.0461 191.69)",
+          "oklch(49% 0.0576 191.69)",
+          "oklch(61% 0.0576 191.69)",
+          "oklch(72% 0.0461 191.69)",
+          "oklch(84% 0.0288 191.69)",
+          "oklch(95% 0.0104 191.69)"
+        ]
+      },
+      "echo-teal": {
+        "role": "primary",
+        "displayName": "Echo Teal",
+        "tonalRamp": [
+          "oklch(15% 0.0151 189.65)",
+          "oklch(26% 0.0303 189.65)",
+          "oklch(38% 0.0484 189.65)",
+          "oklch(49% 0.0606 189.65)",
+          "oklch(61% 0.0606 189.65)",
+          "oklch(72% 0.0484 189.65)",
+          "oklch(84% 0.0303 189.65)",
+          "oklch(95% 0.0109 189.65)"
+        ]
+      },
+      "atmosphere-floor": {
+        "role": "neutral",
+        "displayName": "Atmosphere Floor",
+        "tonalRamp": [
+          "oklch(15% 0.0030 145.48)",
+          "oklch(26% 0.0060 145.48)",
+          "oklch(38% 0.0096 145.48)",
+          "oklch(49% 0.0120 145.48)",
+          "oklch(61% 0.0120 145.48)",
+          "oklch(72% 0.0096 145.48)",
+          "oklch(84% 0.0060 145.48)",
+          "oklch(95% 0.0022 145.48)"
+        ]
+      },
+      "pulse-surface": {
+        "role": "primary",
+        "displayName": "Pulse Surface",
+        "tonalRamp": [
+          "oklch(15% 0.0027 149.86)",
+          "oklch(26% 0.0054 149.86)",
+          "oklch(38% 0.0087 149.86)",
+          "oklch(49% 0.0109 149.86)",
+          "oklch(61% 0.0109 149.86)",
+          "oklch(72% 0.0087 149.86)",
+          "oklch(84% 0.0054 149.86)",
+          "oklch(95% 0.0020 149.86)"
+        ]
+      },
+      "data-01": {
+        "role": "secondary",
+        "displayName": "Scientific Scale 01",
+        "tonalRamp": [
+          "oklch(15% 0.0056 200.24)",
+          "oklch(26% 0.0111 200.24)",
+          "oklch(38% 0.0178 200.24)",
+          "oklch(49% 0.0222 200.24)",
+          "oklch(61% 0.0222 200.24)",
+          "oklch(72% 0.0178 200.24)",
+          "oklch(84% 0.0111 200.24)",
+          "oklch(95% 0.0040 200.24)"
+        ]
+      },
+      "data-02": {
+        "role": "secondary",
+        "displayName": "Scientific Scale 02",
+        "tonalRamp": [
+          "oklch(15% 0.0196 218.04)",
+          "oklch(26% 0.0393 218.04)",
+          "oklch(38% 0.0628 218.04)",
+          "oklch(49% 0.0785 218.04)",
+          "oklch(61% 0.0785 218.04)",
+          "oklch(72% 0.0628 218.04)",
+          "oklch(84% 0.0393 218.04)",
+          "oklch(95% 0.0141 218.04)"
+        ]
+      },
+      "data-03": {
+        "role": "secondary",
+        "displayName": "Scientific Scale 03",
+        "tonalRamp": [
+          "oklch(15% 0.0250 225.60)",
+          "oklch(26% 0.0501 225.60)",
+          "oklch(38% 0.0801 225.60)",
+          "oklch(49% 0.1001 225.60)",
+          "oklch(61% 0.1001 225.60)",
+          "oklch(72% 0.0801 225.60)",
+          "oklch(84% 0.0501 225.60)",
+          "oklch(95% 0.0180 225.60)"
+        ]
+      },
+      "data-04": {
+        "role": "secondary",
+        "displayName": "Scientific Scale 04",
+        "tonalRamp": [
+          "oklch(15% 0.0284 242.59)",
+          "oklch(26% 0.0567 242.59)",
+          "oklch(38% 0.0908 242.59)",
+          "oklch(49% 0.1135 242.59)",
+          "oklch(61% 0.1135 242.59)",
+          "oklch(72% 0.0908 242.59)",
+          "oklch(84% 0.0567 242.59)",
+          "oklch(95% 0.0204 242.59)"
+        ]
+      },
+      "data-05": {
+        "role": "secondary",
+        "displayName": "Scientific Scale 05",
+        "tonalRamp": [
+          "oklch(15% 0.0236 167.04)",
+          "oklch(26% 0.0472 167.04)",
+          "oklch(38% 0.0755 167.04)",
+          "oklch(49% 0.0944 167.04)",
+          "oklch(61% 0.0944 167.04)",
+          "oklch(72% 0.0755 167.04)",
+          "oklch(84% 0.0472 167.04)",
+          "oklch(95% 0.0170 167.04)"
+        ]
+      },
+      "data-06": {
+        "role": "secondary",
+        "displayName": "Scientific Scale 06",
+        "tonalRamp": [
+          "oklch(15% 0.0350 135.19)",
+          "oklch(26% 0.0700 135.19)",
+          "oklch(38% 0.1119 135.19)",
+          "oklch(49% 0.1399 135.19)",
+          "oklch(61% 0.1399 135.19)",
+          "oklch(72% 0.1119 135.19)",
+          "oklch(84% 0.0700 135.19)",
+          "oklch(95% 0.0252 135.19)"
+        ]
+      },
+      "data-07": {
+        "role": "secondary",
+        "displayName": "Scientific Scale 07",
+        "tonalRamp": [
+          "oklch(15% 0.0349 111.25)",
+          "oklch(26% 0.0698 111.25)",
+          "oklch(38% 0.1116 111.25)",
+          "oklch(49% 0.1395 111.25)",
+          "oklch(61% 0.1395 111.25)",
+          "oklch(72% 0.1116 111.25)",
+          "oklch(84% 0.0698 111.25)",
+          "oklch(95% 0.0251 111.25)"
+        ]
+      },
+      "data-08": {
+        "role": "secondary",
+        "displayName": "Scientific Scale 08",
+        "tonalRamp": [
+          "oklch(15% 0.0354 91.28)",
+          "oklch(26% 0.0708 91.28)",
+          "oklch(38% 0.1133 91.28)",
+          "oklch(49% 0.1416 91.28)",
+          "oklch(61% 0.1416 91.28)",
+          "oklch(72% 0.1133 91.28)",
+          "oklch(84% 0.0708 91.28)",
+          "oklch(95% 0.0255 91.28)"
+        ]
+      },
+      "data-09": {
+        "role": "secondary",
+        "displayName": "Scientific Scale 09",
+        "tonalRamp": [
+          "oklch(15% 0.0345 67.81)",
+          "oklch(26% 0.0691 67.81)",
+          "oklch(38% 0.1105 67.81)",
+          "oklch(49% 0.1382 67.81)",
+          "oklch(61% 0.1382 67.81)",
+          "oklch(72% 0.1105 67.81)",
+          "oklch(84% 0.0691 67.81)",
+          "oklch(95% 0.0249 67.81)"
+        ]
+      },
+      "data-10": {
+        "role": "secondary",
+        "displayName": "Scientific Scale 10",
+        "tonalRamp": [
+          "oklch(15% 0.0368 41.95)",
+          "oklch(26% 0.0737 41.95)",
+          "oklch(38% 0.1179 41.95)",
+          "oklch(49% 0.1474 41.95)",
+          "oklch(61% 0.1474 41.95)",
+          "oklch(72% 0.1179 41.95)",
+          "oklch(84% 0.0737 41.95)",
+          "oklch(95% 0.0265 41.95)"
+        ]
+      },
+      "data-11": {
+        "role": "secondary",
+        "displayName": "Scientific Scale 11",
+        "tonalRamp": [
+          "oklch(15% 0.0395 22.10)",
+          "oklch(26% 0.0791 22.10)",
+          "oklch(38% 0.1265 22.10)",
+          "oklch(49% 0.1582 22.10)",
+          "oklch(61% 0.1582 22.10)",
+          "oklch(72% 0.1265 22.10)",
+          "oklch(84% 0.0791 22.10)",
+          "oklch(95% 0.0285 22.10)"
+        ]
+      },
+      "data-12": {
+        "role": "secondary",
+        "displayName": "Scientific Scale 12",
+        "tonalRamp": [
+          "oklch(15% 0.0283 350.11)",
+          "oklch(26% 0.0566 350.11)",
+          "oklch(38% 0.0905 350.11)",
+          "oklch(49% 0.1131 350.11)",
+          "oklch(61% 0.1131 350.11)",
+          "oklch(72% 0.0905 350.11)",
+          "oklch(84% 0.0566 350.11)",
+          "oklch(95% 0.0204 350.11)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Exhibition Display",
+        "purpose": "Expressive hero headline; responsive overrides in exhibition.css."
+      },
+      "headline": {
+        "displayName": "Section Headline",
+        "purpose": "Supporting landing section titles."
+      },
+      "title": {
+        "displayName": "Workspace Title",
+        "purpose": "Scientific page title."
+      },
+      "body": {
+        "displayName": "Exhibition Body",
+        "purpose": "Landing explanations."
+      },
+      "workspace-body": {
+        "displayName": "Workspace Body",
+        "purpose": "Compact analytical content."
+      },
+      "label": {
+        "displayName": "Scientific Label",
+        "purpose": "Labels and controls."
+      },
+      "supporting": {
+        "displayName": "Supporting Text",
+        "purpose": "Units, legends and provenance."
+      }
+    },
+    "shadows": [
+      {
+        "name": "export-menu",
+        "value": "0 10px 25px #1f3c3010",
+        "purpose": "Transient menu overlay."
+      },
+      {
+        "name": "selected-view-tab",
+        "value": "0 1px 3px #1f3c3014",
+        "purpose": "White selected view tab."
+      },
+      {
+        "name": "timeline-current",
+        "value": "0 0 0 3px #dfebd5",
+        "purpose": "Current timeline point."
+      }
+    ],
+    "motion": [
+      {
+        "name": "hover-in",
+        "value": "140ms",
+        "purpose": "Entering pointer state."
+      },
+      {
+        "name": "hover-out",
+        "value": "200ms",
+        "purpose": "Leaving pointer state."
+      },
+      {
+        "name": "press",
+        "value": "90ms",
+        "purpose": "Button press."
+      },
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(.2,.8,.2,1)",
+        "purpose": "Shared soft landing."
+      },
+      {
+        "name": "pulse-duration",
+        "value": "1800ms",
+        "purpose": "Explicit exhibition pulse ring."
+      },
+      {
+        "name": "antenna-steer",
+        "value": "lerp factor 0.07; pointer.x × 0.36 radians",
+        "purpose": "Gentle antenna interpolation; demand invalidation until settled."
+      },
+      {
+        "name": "scene-render",
+        "value": "frameloop=demand; dpr=[1,1.5]",
+        "purpose": "Desktop pointer, scroll and active-pulse frames only."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide",
+        "value": "1600px"
+      },
+      {
+        "name": "compact-desktop",
+        "value": "1150px"
+      },
+      {
+        "name": "exhibition-compact",
+        "value": "1100px"
+      },
+      {
+        "name": "tablet",
+        "value": "900px"
+      },
+      {
+        "name": "phone-static-scene",
+        "value": "700px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Landing workspace action with restrained pointer feedback.",
+      "html": "<button class=\"ds-primary\">Explore the workspace <svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><path d=\"M7 17 17 7M7 7h10v10\"/></svg></button>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:18px;min-height:47px;padding:12px 21px;border-radius:5px;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;background:#214e4e;color:#fff;border:0;cursor:pointer;transition:background-color 200ms cubic-bezier(.2,.8,.2,1),transform 200ms cubic-bezier(.2,.8,.2,1);}.ds-primary:focus-visible{outline:2px solid #257e87;outline-offset:5px;}@media(hover:hover) and (pointer:fine){.ds-primary:hover{transform:translateY(-1px);transition-duration:140ms}}.ds-primary:active{transform:translateY(1px) scale(.985)}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}.ds-primary:is(:hover,:active){transform:none}}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Landing workspace action with restrained pointer feedback.",
+      "html": "<button class=\"ds-outline\">Explore the workspace <svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><path d=\"M7 17 17 7M7 7h10v10\"/></svg></button>",
+      "css": ".ds-outline{display:inline-flex;align-items:center;justify-content:center;gap:18px;min-height:47px;padding:12px 21px;border-radius:5px;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;background:transparent;color:#243f3e;border:1px solid #cad4cc;cursor:pointer;transition:background-color 200ms cubic-bezier(.2,.8,.2,1),transform 200ms cubic-bezier(.2,.8,.2,1);}.ds-outline:focus-visible{outline:2px solid #257e87;outline-offset:5px;}@media(hover:hover) and (pointer:fine){.ds-outline:hover{transform:translateY(-1px);transition-duration:140ms}}.ds-outline:active{transform:translateY(1px) scale(.985)}@media(prefers-reduced-motion:reduce){.ds-outline{transition:none}.ds-outline:is(:hover,:active){transform:none}}"
+    },
+    {
+      "name": "Scientific Numeric Field",
+      "kind": "input",
+      "refersTo": "numeric-field",
+      "description": "Numeric field with a visible scientific label and unit.",
+      "html": "<label class=\"ds-field\">Maximum <span>dBZ</span><input type=\"number\" value=\"60\" aria-label=\"Maximum reflectivity in dBZ\"></label>",
+      "css": ".ds-field{display:block;max-width:180px;font:500 12px \"DM Sans\",sans-serif;color:#586754}.ds-field>span{float:right;font-size:11px;font-weight:400;color:#5c6558}.ds-field input{display:block;width:100%;margin-top:8px;padding:9px 10px;min-height:36px;border:1px solid #dbe4d4;border-radius:4px;background:#fff;color:#46613f;font:12px \"DM Sans\",sans-serif;caret-color:#2b6b6d}.ds-field input:focus-visible{outline:2px solid #7eb5b2;outline-offset:2px}"
+    },
+    {
+      "name": "Workspace Navigation",
+      "kind": "nav",
+      "refersTo": "navigation-selected",
+      "description": "Primary workspace navigation with persistent selected state.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Workspace navigation\"><button aria-current=\"page\">Radar workspace</button><button>Data library</button></nav>",
+      "css": ".ds-nav{display:flex;flex-direction:column;gap:5px;max-width:210px;background:#f0f3ed;padding:13px}.ds-nav button{border:0;background:transparent;text-align:left;min-height:43px;padding:10px 12px;border-radius:5px;font:12px \"DM Sans\",sans-serif;color:#5b6a5d;cursor:pointer}.ds-nav button:hover{background:#e6ede3;color:#284c40}.ds-nav button[aria-current=\"page\"]{background:#e0e9dd;color:#2d584a;font-weight:500}.ds-nav button:focus-visible{outline:2px solid #257e87;outline-offset:5px}"
+    },
+    {
+      "name": "Provenance Badge",
+      "kind": "chip",
+      "description": "Informational label that distinguishes synthetic content.",
+      "html": "<span class=\"ds-badge\">Synthetic data</span>",
+      "css": ".ds-badge{display:inline-block;border:1px solid #dce6d1;background:#eef3e8;border-radius:3px;color:#5c6a51;font:11px \"DM Sans\",sans-serif;padding:4px 7px;white-space:nowrap}"
+    },
+    {
+      "name": "Analysis Control Panel",
+      "kind": "card",
+      "refersTo": "control-panel",
+      "description": "A flat bordered scientific control container.",
+      "html": "<section class=\"ds-panel\"><h2>Display settings</h2><p>Range and reflectivity bounds</p></section>",
+      "css": ".ds-panel{max-width:260px;padding:20px 17px;border:1px solid #dfe6d9;background:#fbfcf9;border-radius:6px;color:#536852;font:12px \"DM Sans\",sans-serif}.ds-panel h2{font:500 13px \"DM Sans\",sans-serif;color:#476347;margin:0 0 20px}.ds-panel p{margin:0;font-size:11px;line-height:1.7}"
+    },
+    {
+      "name": "Selected View Tabs",
+      "kind": "custom",
+      "description": "Compact plot-view selection within a tonal track.",
+      "html": "<div class=\"ds-tabs\" role=\"group\" aria-label=\"Plot view\"><button aria-pressed=\"true\">PPI view</button><button aria-pressed=\"false\">Regional context</button></div>",
+      "css": ".ds-tabs{display:inline-flex;gap:4px;padding:3px;background:#f2f5ef;border-radius:4px}.ds-tabs button{border:0;background:transparent;padding:7px 10px;font:12px \"DM Sans\",sans-serif;color:#5c6556;border-radius:3px;cursor:pointer}.ds-tabs button[aria-pressed=\"true\"]{background:#fff;box-shadow:0 1px 3px #1f3c3014;color:#496840}.ds-tabs button:focus-visible{outline:2px solid #257e87;outline-offset:5px}"
+    },
+    {
+      "name": "Send a Pulse",
+      "kind": "button",
+      "refersTo": "signal-button",
+      "description": "The explicit trigger for the exhibition pulse.",
+      "html": "<button class=\"ds-signal\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"2\"/><path d=\"M7.1 7.1a7 7 0 0 0 0 9.8m9.8-9.8a7 7 0 0 1 0 9.8M4.2 4.2a11 11 0 0 0 0 15.6m15.6-15.6a11 11 0 0 1 0 15.6\"/></svg>Send a pulse</button>",
+      "css": ".ds-signal{display:flex;gap:8px;align-items:center;border:1px solid #a8c4ba;background:#edf4ee;color:#456b60;padding:10px 13px;border-radius:5px;font:11px \"DM Sans\",sans-serif;cursor:pointer;transition:background-color .15s}.ds-signal:hover{background:#dcebe2}.ds-signal:active{background:#cbded2}.ds-signal:focus-visible{outline:2px solid #257e87;outline-offset:5px}@media(prefers-reduced-motion:reduce){.ds-signal{transition:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Beam to Data",
+    "overview": "A representative radar occupies a pale studio, with soft physical shadows, subdued metal and green-grey materials. Expressive large type and muted teal actions frame the instrument while an illustrative sampling field unfolds around it. The exhibition is spacious and spatial; the research workspace uses the same family of surfaces at a more compact, formal density.\n\nThe implemented system is a local research prototype. Representative models, illustrative echoes and synthetic datasets retain explicit labels. The analytical view keeps methods, units and provenance close to the output. Its visual confidence comes from clear structure and usable scientific controls.",
+    "keyCharacteristics": [
+      "Light studio material and cool sage surfaces.",
+      "Expressive Manrope exhibition headings with DM Sans controls and explanatory text.",
+      "Dark teal actions and a distinct scientific data palette.",
+      "Thin borders, gently curved panels and restrained shadows.",
+      "Intact physical instrument, rising sampled-gate field and a rendered static alternative."
+    ],
+    "rules": [
+      {
+        "name": "The Data Colour Rule",
+        "body": "Preserve the ordered scientific palette for plotted values and their legends; interface actions remain in the teal and sage family.",
+        "section": "colors"
+      },
+      {
+        "name": "The Scientific Legibility Rule",
+        "body": "Read the effective cascade through `src/legibility.css` and `src/exhibition.css` before reusing a size from the base stylesheet; the base stylesheet contains superseded small text values.",
+        "section": "typography"
+      },
+      {
+        "name": "The Measured Depth Rule",
+        "body": "Keep analysis panels flat and bordered; reserve cast shadows for spatial exhibition content and genuinely overlaid or selected controls.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** preserve the light studio and the formal scientific workspace as expressions of one visual family.",
+      "**Do** keep scientific units, provenance and synthetic or representative labels visible beside the relevant material.",
+      "**Do** use the effective legibility overrides when extending controls, legends and metadata.",
+      "**Do** keep the rendered static poster for mobile and reduced-motion visitors.",
+      "**Do** keep keyboard focus visible and use SVG line icons for interface controls."
+    ],
+    "donts": [
+      "**Don't** replace the pinned studio direction with an alternate visual world.",
+      "**Don't** use the scientific data scale as decorative interface colour.",
+      "**Don't** imply surveyed geography, a verified station model or measured data through unqualified visuals.",
+      "**Don't** turn the landing's exhibition composition into a required layout for analytical screens.",
+      "**Don't** inherit incidental small uppercase location, workspace or step labels as a general eyebrow pattern."
+    ]
+  }
+}

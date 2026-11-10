@@ -1,0 +1,42 @@
+/* Readable scientific controls and supporting text at every shipped size. */
+.hero-copy h1{letter-spacing:-.04em}
+.radar-static-poster{display:block;width:100%;height:100%;object-fit:contain}
+.hero-instrument{font-size:12px}
+.hero-instrument div>span,.hero-prototype{font-size:11px}
+.dashboard-topbar,.page-heading p,.dataset-strip div>span,.sidebar-bottom>button,.sidebar-bottom>a{font-size:12px}
+.sidebar nav button{font-size:12px}
+.sidebar-section-label,.prototype-note,.prototype-note>span:last-child,.demo-badge,.nav-count{font-size:11px}
+.dataset-strip strong{font-size:13px}
+.data-badge{font-size:11px}
+.dataset-strip>.text-button{font-size:11px}
+.control-title h2{font-size:13px}
+.control-panel label,.control-panel select,.control-panel input[type=number],.control-panel .check-label{font-size:12px}
+.control-unit,.range-labels,.control-help p,.reset-controls{font-size:11px}
+.control-help p{line-height:1.7}
+.view-tabs button{font-size:12px}
+.plot-tag,.plot-readout,.colorbar-row{font-size:11px}
+.colorbar-ticks,.timeline-track button,.utc-label{font-size:11px}
+.timeline-track button{padding-inline:3px}
+.scan-summary span{font-size:11px}
+.scan-summary strong{font-size:12px}
+.scan-summary small,.workspace-footnote,.workspace-footnote .text-button,.workspace-footer{font-size:11px}
+.scan-summary{grid-template-columns:1.4fr 1fr .8fr 1.2fr}
+.library-import p,.library-import div>span,.file-table th,.file-table td,.file-table td strong,.file-table .text-button{font-size:12px}
+.file-table td div>span,.ready-state{font-size:11px}
+.method-banner strong,.formula-panel label,.rainfall-result dl>div,.methods-layout p{font-size:13px}
+.method-banner p,.method-banner .text-button,.formula-panel>p,.rainfall-result>span,.rainfall-result>p,.rainfall-result>.link,.accumulation-panel p,.accumulation-panel label,.accumulation-panel>div:last-child>span,.methods-aside dl>div,.methods-aside ul,.methods-aside>.link{font-size:12px}
+.map-qualifier{position:absolute;top:16px;left:16px;padding:7px 9px;background:#f8fbf2;border:1px solid #d4dfc8;border-radius:3px;font-size:11px;color:#455f3a;pointer-events:none}
+.map-zoom button{display:flex;align-items:center;justify-content:center}
+@media(max-width:1150px){.scan-summary{grid-template-columns:1fr 1fr;row-gap:20px}.scan-summary>div:nth-child(2){border:0}}
+@media(max-width:700px){
+  .hero-instrument{max-width:150px;font-size:10px;bottom:94px}.hero-instrument div>span{font-size:10px}.hero-prototype{font-size:10px}
+  .radar-stage{left:19%;width:90%;top:39%;height:48%}
+  .sidebar nav button{font-size:11px;min-height:42px;padding:7px 6px;gap:5px}.sidebar nav button:nth-child(4){font-size:0}.sidebar nav button:nth-child(4):after{font-size:11px}
+  .dashboard-topbar{font-size:11px}.page-heading p{font-size:12px}.page-heading .export-menu summary{font-size:0}
+  .dataset-strip{flex-wrap:wrap}.dataset-strip div>span{font-size:11px}.dataset-strip strong{font-size:12px}.dataset-strip>.text-button{font-size:0}.dataset-strip>.data-badge{display:inline-flex;margin:0 0 0 25px;font-size:10px}
+  .control-panel label,.control-panel select,.control-panel input[type=number],.control-panel .check-label{font-size:12px}.control-panel select{padding-inline:6px}.control-unit,.range-labels{font-size:10px}
+  .view-tabs button{font-size:11px}.plot-readout{font-size:10px}.plot-readout span{max-width:57%;line-height:1.4}.colorbar-row{font-size:10px;gap:10px}.colorbar-ticks{font-size:10px}.colorbar-group{max-width:190px}
+  .timeline{gap:9px}.timeline-track button{font-size:10px;padding-inline:1px}.utc-label{display:none}.scan-summary strong{font-size:11px}.scan-summary span{font-size:10px}.workspace-footer{font-size:10px;gap:15px}
+  .workspace-footer>span:first-child{max-width:45%}.workspace-footer>span:last-child{text-align:right}
+  .map-qualifier{top:11px;left:11px;font-size:10px;max-width:220px}
+}

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+.qa/
+.taste-skill/
+.runtime/
+*.tsbuildinfo
