@@ -574,7 +574,7 @@ export default function Dashboard({ page }: { page: Page }) {
               }}
             />
           )}
-          {page === 'methods' && <Methods service={service} archiveDays={archiveDays} />}
+          {page === 'methods' && <Methods service={service} />}
         </main>
         <footer className="workspace-footer">
           <span>Radar Metrology · Mahabaleshwar</span>

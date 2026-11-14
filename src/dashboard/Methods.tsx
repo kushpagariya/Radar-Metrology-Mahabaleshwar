@@ -1,13 +1,7 @@
 import { ArrowUpRight } from 'lucide-react';
-import { BEAMWIDTH_DEG, formatDay, ZR_PRESETS, type ArchiveDaySummary } from '../data';
+import { BEAMWIDTH_DEG, ZR_PRESETS } from '../data';
 
-export default function Methods({
-  service,
-  archiveDays,
-}: {
-  service: boolean;
-  archiveDays: ArchiveDaySummary[];
-}) {
+export default function Methods({ service }: { service: boolean }) {
   return (
     <div className="methods-layout">
       <article>
@@ -25,52 +19,22 @@ export default function Methods({
           not a verified antenna coordinate. The 82.5 km demonstration range is a design setting, not an
           instrument specification.
         </p>
-        <h3>MBL-RADAR archive</h3>
+        <h3>Observed radar data</h3>
         <p>
-          Observed days come from MBL-RADAR, an X-band (9.46 GHz) dual-polarisation radar at 17.925° N,
-          73.660° E, 1410 m, recorded by Sigmet IRIS and converted to CfRadial-1.4 by RadxConvert. Each
-          volume, about every 10 minutes, holds 11 PPI sweeps at 0.5, 1, 1.5, 3, 6, 9, 12, 30, 45, 60 and 89°
-          with 150 m gates (to 170 km at low elevations) and 15 fields, including DBZ, DBZ_TOT, VEL, ZDR, KDP,
-          RHOHV and HCLASS. The 0.5° sweep holds 339 rays, leaving a sector without data that is shown as a
-          gap, never filled.
+          Observed volumes are read in the CfRadial format written for MBL-RADAR, an X-band (9.46 GHz)
+          dual-polarisation radar at 17.925° N, 73.660° E, 1410 m. Each volume holds PPI sweeps from 0.5° to
+          89° with 150 m gates and the full set of polarimetric fields. Azimuth sectors without rays are shown
+          as gaps, never filled.
         </p>
         <p>
-          The pipeline (<code>backend/pipeline.py</code>) reads volumes directly from the zip archives, checks
-          each against the observed scan profile, records gaps and failures, and writes a per-day catalog. For
-          playback, comparison, gate time series and accumulation it builds a co-registered lowest-sweep
-          product: DBZ screened with RHOHV ≥ 0.7, averaged in linear Z over four gates (600 m, at least two
-          valid) and assigned to 1° azimuth bins from the nearest ray within ±0.75°. Full-resolution sweeps
-          are read on demand from the original volume and displayed with every sixth gate (0.9 km). No
-          attenuation, clutter, beam-blockage or calibration correction is applied beyond the IRIS processing
-          already in DBZ.
+          The processing pipeline checks each volume against the expected scan profile, records missing
+          volumes and failures, and builds a co-registered lowest-sweep product for playback, comparison, gate
+          time series and accumulation: DBZ screened with RHOHV ≥ 0.7, averaged in linear Z over four gates
+          (600 m, at least two valid) and assigned to 1° azimuth bins from the nearest ray within ±0.75°.
+          Full-resolution sweeps are read on demand and displayed with every sixth gate (0.9 km). No
+          attenuation, clutter, beam-blockage or calibration correction is applied beyond the processing
+          already present in DBZ.
         </p>
-        {archiveDays.length > 0 && (
-          <table className="methods-table">
-            <thead>
-              <tr>
-                <th>Day</th>
-                <th>Volumes</th>
-                <th>Gaps</th>
-                <th>Peak</th>
-              </tr>
-            </thead>
-            <tbody>
-              {archiveDays.map((d) => (
-                <tr key={d.date}>
-                  <td>{formatDay(d.date)}</td>
-                  <td>
-                    {d.volume_count}/{d.expected_volumes}
-                  </td>
-                  <td>
-                    {d.gaps.map((g) => `${g.after.slice(11, 16)}–${g.before.slice(11, 16)} UTC`).join(', ') ||
-                      'None'}
-                  </td>
-                  <td>{d.summary.peak_dbz ?? '—'} dBZ</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
         <h3>NetCDF inspection</h3>
         <p>
           The local API inspects groups, dimensions, variables, units and attributes. Supported polar scans
@@ -127,7 +91,7 @@ export default function Methods({
           Accumulation integrates consecutive rainfall rates trapezoidally in hours and excludes intervals
           longer than 15 minutes. When the Python service is connected it performs the integration; otherwise
           the browser runs the same method. In the demonstration, gates with no echo are treated as zero rain.
-          For archive days it uses the lowest-sweep product, treats sampled gates below 10 dBZ as no rain and
+          For observed data it uses the lowest-sweep product, treats sampled gates below 10 dBZ as no rain and
           excludes unsampled rays; totals are radar estimates, not gauge-adjusted, and X-band attenuation in
           heavy rain will cause underestimates behind intense cells. Scan comparisons subtract co-registered
           gates (later minus earlier); they are only offered for scans that share identical polar geometry.

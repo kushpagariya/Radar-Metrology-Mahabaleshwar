@@ -26,6 +26,8 @@ const TABS: { id: View; label: string; icon: typeof Radar }[] = [
   { id: 'compare', label: 'Compare', icon: GitCompare },
   { id: 'accum', label: 'Accumulation', icon: CloudRain },
 ];
+/** Shared empty list: a fresh [] per render would re-trigger effects that report sweeps upward. */
+const NO_SCANS: Scan[] = [];
 export const DIFF_SCALE = { min: -20, max: 20 };
 export const ACCUM_WINDOWS = [1, 3, 6, 24];
 
@@ -220,7 +222,7 @@ export default function PlotPanel(props: Props) {
 
   // --- Cross-section sweeps -------------------------------------------------------------------------
   const demoSweeps = useMemo(
-    () => (demo && state.view === 'section' ? DEMO_ELEVATIONS.map((e) => demoScan(state.time, e)) : []),
+    () => (demo && state.view === 'section' ? DEMO_ELEVATIONS.map((e) => demoScan(state.time, e)) : NO_SCANS),
     [demo, state.view, state.time],
   );
   const remoteSweeps = useLoader<Scan[]>(
@@ -243,9 +245,9 @@ export default function PlotPanel(props: Props) {
       ).then((all) => (all.filter(Boolean) as Scan[]).sort((x, y) => x.elevation - y.elevation));
     },
   );
-  const sweeps = demo ? demoSweeps : (remoteSweeps.value ?? []);
+  const sweeps = demo ? demoSweeps : (remoteSweeps.value ?? NO_SCANS);
   const { onSweeps, onDisplayed, onBusy } = props;
-  useEffect(() => onSweeps(state.view === 'section' ? sweeps : []), [sweeps, state.view, onSweeps]);
+  useEffect(() => onSweeps(state.view === 'section' ? sweeps : NO_SCANS), [sweeps, state.view, onSweeps]);
 
   // --- Comparison ------------------------------------------------------------------------------------
   const compareTime = day ? Math.min(state.compareTime, catalog!.volumes.length - 1) : state.compareTime;
