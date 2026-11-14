@@ -85,8 +85,11 @@ class ScienceTests(unittest.TestCase):
                 self.assertEqual(r.status_code,200,r.text);file_id=r.json()['id']
                 result=client.get(f'/api/files/{file_id}/scan',params={'field':'DBZH','sweep':1})
                 self.assertEqual(result.status_code,200,result.text);self.assertFalse(result.json()['synthetic'])
+                listed=client.get('/api/files').json()
+                self.assertEqual([f['id'] for f in listed],[file_id]);self.assertNotIn('_path',listed[0])
                 self.assertEqual(client.delete(f'/api/files/{file_id}').status_code,200)
                 self.assertEqual(client.get(f'/api/files/{file_id}/scan',params={'field':'DBZH'}).status_code,404)
+                self.assertEqual(client.get('/api/files').json(),[])
     def test_fake_netcdf_rejected(self):
         with TestClient(app) as client:
             self.assertEqual(client.post('/api/files',files={'file':('fake.nc',b'not netcdf')}).status_code,415)

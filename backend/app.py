@@ -25,7 +25,7 @@ async def lifespan(app):
         records.clear()
 
 
-app = FastAPI(title='Radar Metrology local prototype', version='0.1.0', lifespan=lifespan)
+app = FastAPI(title='Radar Metrology local prototype', version='0.2.0', lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=['http://127.0.0.1:5173', 'http://localhost:5173', 'http://127.0.0.1:4173'], allow_methods=['GET', 'POST', 'DELETE'], allow_headers=['Content-Type'])
 
 
@@ -102,6 +102,13 @@ def upload_file(file: UploadFile = File(...)):
         raise HTTPException(422, 'This file could not be decoded as a supported NetCDF dataset. Check the format and file integrity.')
     finally:
         file.file.close()
+
+
+@app.get('/api/files')
+def list_files():
+    """Files held in this backend session, so a browser refresh can recover them."""
+    with netcdf_lock:
+        return [{k: v for k, v in record.items() if k != '_path'} for record in records.values()]
 
 
 @app.get('/api/files/{file_id}/scan')

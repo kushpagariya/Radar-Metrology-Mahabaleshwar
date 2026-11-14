@@ -22,17 +22,20 @@ python -m pip install -r backend/requirements.txt
 npm run backend
 ```
 
-The API listens on http://127.0.0.1:8000, with documentation at http://127.0.0.1:8000/docs. Vite forwards `/api` requests to it. Use the development server for the complete workflow; static preview does not proxy the backend.
+The API listens on http://127.0.0.1:8000 (set `API_PROXY` before `npm run dev` to point Vite at another backend address), with documentation at http://127.0.0.1:8000/docs. Vite forwards `/api` requests to it. Use the development server for the complete workflow; static preview does not proxy the backend.
 
 ## Included
 
 - Intact representative 3D radar, cursor steering, drag rotation, Send a pulse interaction and scroll-driven spatial sampling field.
 - Simplified mobile and reduced-motion exhibition.
-- Direct PPI workspace, schematic regional map, Data Library and methodology. Overview and the standalone calculator were removed after user review.
-- Six synthetic scans, four illustrative elevations, playback, gate inspection, colour limits, range selection and map pan/zoom.
-- PNG view export, JSON provenance and CSV gate export.
-- Session-only NetCDF upload, metadata inspection, supported selected-sweep plotting and file removal.
-- Python rainfall conversion and timestamp-aware accumulation with gap reporting and masks.
+- Workspace views: PPI, schematic regional map (place markers and contours follow pan/zoom), range–height cross-section, scan comparison (side by side or difference) and rainfall accumulation over the demonstration sequence.
+- Pinned gates: click the plot (or focus it and use the arrow keys, then Enter) to pin a gate. The readout shows beam height (4/3 Earth model); the insights row charts the gate through time and the cross-section follows its azimuth.
+- Z–R presets (Marshall–Palmer, WSR-88D convective, Rosenfeld tropical, custom), an echo-threshold highlight with echo area, and a reflectivity histogram.
+- Shareable links: every workspace setting lives in the URL (copy it with the link button in the top bar).
+- Six synthetic scans × four elevations, playback, stepped colour legends that match the plotted colours.
+- PNG view export, JSON provenance and CSV export of the displayed gates (or cross-section beams).
+- Session-only NetCDF upload, metadata inspection, supported selected-sweep plotting and file removal. Uploaded files survive a page refresh (`GET /api/files`) and are cleared when the backend stops.
+- Python rainfall conversion and timestamp-aware accumulation with gap reporting and masks. The accumulation view uses the Python service when it is connected and the same method in the browser otherwise.
 
 ## Boundaries
 
@@ -51,10 +54,11 @@ The scan-derived rainfall view uses `Z = 10^(dBZ/10)` and `R = (Z/a)^(1/b)`, wit
 ```powershell
 npm run build
 python -m unittest backend.test_science -v
+npx prettier --check "src/**/*.{ts,tsx,css}"
 ```
 
 ## Architecture
 
-Vite + React + TypeScript provide a simple local demonstration workflow. React Three Fiber/Three.js handle 3D, GSAP ScrollTrigger drives the exhibition, and FastAPI + NumPy + NetCDF4 provide scientific endpoints. No persistence dependency is installed. Later stages can add Supabase, validated Mahabaleshwar adapters, Py-ART, a geographic basemap and background workers.
+Vite + React + TypeScript provide (workspace components live in `src/dashboard/`, shared science helpers in `src/data.ts`, charts in `src/charts.tsx`, and all styles in `src/styles.css`) a simple local demonstration workflow. React Three Fiber/Three.js handle 3D, GSAP ScrollTrigger drives the exhibition, and FastAPI + NumPy + NetCDF4 provide scientific endpoints. No persistence dependency is installed. Later stages can add Supabase, validated Mahabaleshwar adapters, Py-ART, a geographic basemap and background workers.
 
 Motion CSS comes from the local design-taste frontend skill. Icons are Lucide. Google Fonts supplies Manrope and DM Sans, with readable local fallbacks offline.

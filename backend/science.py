@@ -8,7 +8,7 @@ import math
 import numpy as np
 from netCDF4 import Dataset
 
-VERSION = 'radar-metrology-prototype-0.1.0'
+VERSION = 'radar-metrology-prototype-0.2.0'
 
 
 def rainfall(dbz, a=200.0, b=1.6):
