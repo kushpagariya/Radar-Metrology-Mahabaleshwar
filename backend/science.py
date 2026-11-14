@@ -137,8 +137,15 @@ def _scalar(group, names, fallback=None):
     return fallback
 
 
-def read_scan(path, field, sweep=0):
-    with Dataset(path, 'r') as ds:
+def open_dataset(source):
+    """Open a NetCDF file from a path, or from bytes already in memory (e.g. a zip member)."""
+    if isinstance(source, (bytes, bytearray, memoryview)):
+        return Dataset('in-memory.nc', mode='r', memory=bytes(source))
+    return Dataset(source, 'r')
+
+
+def read_scan(path, field, sweep=0, max_rays=360, max_gates=220):
+    with open_dataset(path) as ds:
         parts = field.split('/'); group = ds
         for name in parts[:-1]:
             if name not in group.groups:
@@ -227,7 +234,7 @@ def read_scan(path, field, sweep=0):
             raise ValueError('Insufficient or mismatched polar scan dimensions.')
         if not np.all(np.isfinite(ranges)) or np.any(np.diff(ranges) <= 0) or np.any(ranges < 0) or not np.all(np.isfinite(az)):
             raise ValueError('Range must increase and polar coordinates must be finite.')
-        ray_step = max(1, math.ceil(len(az) / 360)); gate_step = max(1, math.ceil(len(ranges) / 220))
+        ray_step = max(1, math.ceil(len(az) / max_rays)); gate_step = max(1, math.ceil(len(ranges) / max_gates))
         data = data[::ray_step, ::gate_step]; az = az[::ray_step] % 360; ranges = ranges[::gate_step]
         order = np.argsort(az); az = az[order]; data = data[order]
         values = np.ma.filled(data, np.nan); values[(values < -80) | (values > 100)] = np.nan

@@ -6,14 +6,17 @@ from threading import RLock
 from uuid import uuid4
 from typing import Annotated
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict, Field
+from .archive import Archive
 from .science import VERSION, inspect_netcdf, integrate, rainfall, read_scan
 
 MAX_FILE = 64 * 1024 * 1024
 MAX_SESSION = 384 * 1024 * 1024
 records: dict = {}
+archive = Archive()
 netcdf_lock = RLock()
 
 
@@ -27,6 +30,7 @@ async def lifespan(app):
 
 app = FastAPI(title='Radar Metrology local prototype', version='0.2.0', lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=['http://127.0.0.1:5173', 'http://localhost:5173', 'http://127.0.0.1:4173'], allow_methods=['GET', 'POST', 'DELETE'], allow_headers=['Content-Type'])
+app.add_middleware(GZipMiddleware, minimum_size=2048)
 
 
 class FormulaRequest(BaseModel):
@@ -49,7 +53,8 @@ class AccumulationRequest(BaseModel):
 
 @app.get('/api/health')
 def health():
-    return {'status': 'ok', 'mode': 'local session prototype', 'database': False, 'version': VERSION}
+    return {'status': 'ok', 'mode': 'local session prototype', 'database': False, 'version': VERSION,
+            'archive_days': len(archive.days())}
 
 
 @app.post('/api/rainfall')
@@ -136,3 +141,51 @@ def delete_file(file_id: str):
             raise HTTPException(404, 'File not found in this local session.')
         record['_path'].unlink(missing_ok=True)
     return {'removed': file_id}
+
+
+# --- Processed radar archive (see backend/pipeline.py) -------------------------------------------------------
+
+def _archive_call(fn, *args):
+    try:
+        return fn(*args)
+    except KeyError:
+        raise HTTPException(404, 'This day is not in the processed archive. Run the pipeline ingest first.')
+    except IndexError:
+        raise HTTPException(404, 'Volume index is outside this day.')
+    except FileNotFoundError as exc:
+        raise HTTPException(410, str(exc))
+    except ValueError as exc:
+        raise HTTPException(422, str(exc))
+
+
+@app.get('/api/archive')
+def archive_days():
+    return archive.days()
+
+
+@app.get('/api/archive/{date}')
+def archive_day(date: str):
+    return _archive_call(archive.catalog, date)
+
+
+@app.get('/api/archive/{date}/volumes/{index}/sweep')
+def archive_sweep(date: str, index: int, field: str = 'DBZ', sweep: int = Query(0, ge=0, le=31)):
+    with netcdf_lock:
+        return _archive_call(archive.sweep, date, index, field, sweep)
+
+
+@app.get('/api/archive/{date}/volumes/{index}/product')
+def archive_product(date: str, index: int):
+    return _archive_call(archive.product, date, index)
+
+
+@app.get('/api/archive/{date}/accumulation')
+def archive_accumulation(date: str, a: float = Query(200, ge=1, le=2000), b: float = Query(1.6, ge=0.5, le=3),
+                         start: int = Query(0, ge=0), end: int | None = Query(None, ge=1),
+                         max_gap_minutes: float = Query(15, gt=0, le=1440)):
+    return _archive_call(archive.accumulation, date, a, b, start, end, max_gap_minutes)
+
+
+@app.get('/api/archive/{date}/gate')
+def archive_gate(date: str, az: float = Query(..., ge=0, le=360), range_km: float = Query(..., ge=0, le=500)):
+    return _archive_call(archive.gate_series, date, az, range_km)

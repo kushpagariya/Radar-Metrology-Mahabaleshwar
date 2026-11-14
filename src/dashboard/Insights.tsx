@@ -1,8 +1,19 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { MapPin, X } from 'lucide-react';
 import { Histogram, TimeSeries } from '../charts';
-import { beamHeight, demoScan, histogram, rainRate, scanStats, TIMES, valueAt, type Scan } from '../data';
-import type { ViewState } from './state';
+import {
+  beamHeight,
+  demoScan,
+  histogram,
+  rainRate,
+  scanStats,
+  TIMES,
+  utcClock,
+  valueAt,
+  type ArchiveCatalog,
+  type Scan,
+} from '../data';
+import { dayOf, isDay, type ViewState } from './state';
 
 export default function Insights({
   state,
@@ -10,24 +21,50 @@ export default function Insights({
   scan,
   transform,
   units,
+  catalog,
 }: {
   state: ViewState;
   set: (patch: Partial<ViewState>) => void;
   scan: Scan | null;
   transform: (v: number) => number;
   units: string;
+  catalog: ArchiveCatalog | null;
 }) {
   const demo = state.source === 'demo';
   const stats = useMemo(() => (scan ? scanStats(scan, state.threshold) : null), [scan, state.threshold]);
   const bins = useMemo(() => (scan ? histogram(scan) : []), [scan]);
+  const day = isDay(state.source) && catalog ? dayOf(state.source) : null;
+  const [daySeries, setDaySeries] = useState<{ key: string; dbz: (number | null)[]; times: string[] } | null>(
+    null,
+  );
+  const pinKey = day && state.pin ? `${day}|${state.pin.az}|${state.pin.range}` : '';
+  useEffect(() => {
+    if (!pinKey) return;
+    const controller = new AbortController();
+    fetch(`/api/archive/${day}/gate?az=${state.pin!.az}&range_km=${state.pin!.range}`, {
+      signal: controller.signal,
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d && setDaySeries({ key: pinKey, dbz: d.dbz, times: d.times }))
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, [pinKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const series = useMemo(() => {
     if (!state.pin || !scan) return [];
+    if (day) {
+      if (!daySeries || daySeries.key !== pinKey) return [];
+      return daySeries.dbz.map((v, i) => ({
+        label: utcClock(daySeries.times[i]),
+        value: v === null ? null : transform(v),
+      }));
+    }
     const scans = demo ? TIMES.map((_, i) => demoScan(i, state.elevation)) : [scan];
     return scans.map((s, i) => {
       const v = valueAt(s, state.pin!);
       return { label: demo ? TIMES[i] : 'This scan', value: v === null ? null : transform(v) };
     });
-  }, [state.pin, state.elevation, scan, demo, transform]);
+  }, [state.pin, state.elevation, scan, demo, transform, day, daySeries, pinKey]);
 
   const peakRate = stats ? rainRate(stats.max, state.a, state.b) : null;
 
@@ -88,7 +125,8 @@ export default function Insights({
                 {state.pin.az.toFixed(1)}° / {state.pin.range.toFixed(1)} km · beam{' '}
                 {beamHeight(state.pin.range, scan.elevation).toFixed(2)} km above antenna
               </p>
-              {demo ? (
+              {day && <p className="insight-meta">Whole day · lowest-sweep product (0.5°, 1° × 600 m)</p>}
+              {demo || day ? (
                 <TimeSeries
                   points={series}
                   units={units}

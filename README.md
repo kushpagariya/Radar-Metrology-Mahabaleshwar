@@ -24,6 +24,21 @@ npm run backend
 
 The API listens on http://127.0.0.1:8000 (set `API_PROXY` before `npm run dev` to point Vite at another backend address), with documentation at http://127.0.0.1:8000/docs. Vite forwards `/api` requests to it. Use the development server for the complete workflow; static preview does not proxy the backend.
 
+## MBL-RADAR archive pipeline
+
+Observed data from MBL-RADAR (X-band 9.46 GHz dual-pol, 17.925° N, 73.660° E, 1410 m) arrives as CfRadial-1.4 volumes (`cfrad.YYYYMMDD_HHMMSS…_MBL-RADAR_SUR.nc`), about one every 10 minutes, each with 11 PPI sweeps (0.5–89°), 150 m gates and 15 fields. Process one or more days, as zip archives or folders, with the backend virtual environment active:
+
+```powershell
+python -m backend.pipeline ingest "C:/data/full_sweeps.zip" "C:/data/next_day.zip"
+python -m backend.pipeline summary
+```
+
+The pipeline reads volumes directly from the zips (nothing is extracted), groups them by UTC day, validates each against the observed scan profile, and records gaps, failures and deviations instead of stopping. Per day it writes `data/archive/MBL-RADAR/<date>/catalog.json` and `low.npz`: a co-registered lowest-sweep product (DBZ screened with RHOHV ≥ 0.7, 4-gate linear-Z mean to 600 m, nearest ray into 1° azimuth bins, unsampled sectors kept empty). Three days (430 volumes, ~3.9 GB of zips) process in about a minute into ~8 MB of products. Set `RADAR_ARCHIVE_DIR` to store products elsewhere.
+
+The catalog keeps the path of each source zip; full-resolution sweeps and cross-sections are read from there on demand, so keep the zips where they were ingested (or re-run the ingest after moving them). Processed days appear in the Data library. Each day gives a timeline strip, playback, all 11 elevations, DBZ / DBZ_TOT fields, real cross-sections, product-grid comparison, gate time series across the day and server-side accumulation windows (1, 3, 6 h or since 00:00 UTC).
+
+API: `GET /api/archive`, `/api/archive/{date}`, `/api/archive/{date}/volumes/{i}/sweep?field=&sweep=`, `/api/archive/{date}/volumes/{i}/product`, `/api/archive/{date}/accumulation?a=&b=&start=&end=`, `/api/archive/{date}/gate?az=&range_km=`.
+
 ## Included
 
 - Intact representative 3D radar, cursor steering, drag rotation, Send a pulse interaction and scroll-driven spatial sampling field.
@@ -53,7 +68,7 @@ The scan-derived rainfall view uses `Z = 10^(dBZ/10)` and `R = (Z/a)^(1/b)`, wit
 
 ```powershell
 npm run build
-python -m unittest backend.test_science -v
+python -m unittest backend.test_science backend.test_pipeline -v
 npx prettier --check "src/**/*.{ts,tsx,css}"
 ```
 

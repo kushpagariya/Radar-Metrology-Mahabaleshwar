@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import type { ArchiveDaySummary } from '../data';
 
 export type Uploaded = {
   id: string;
@@ -15,11 +16,13 @@ const HEALTH_INTERVAL_MS = 15000;
 export function useBackend() {
   const [service, setService] = useState(false);
   const [uploads, setUploads] = useState<Uploaded[]>([]);
+  const [archiveDays, setArchiveDays] = useState<ArchiveDaySummary[]>([]);
 
   const refreshUploads = useCallback(async () => {
     try {
-      const r = await fetch('/api/files');
-      if (r.ok) setUploads(await r.json());
+      const [files, days] = await Promise.all([fetch('/api/files'), fetch('/api/archive')]);
+      if (files.ok) setUploads(await files.json());
+      if (days.ok) setArchiveDays(await days.json());
     } catch {
       /* service offline: keep current list */
     }
@@ -36,7 +39,10 @@ export function useBackend() {
         setService(up);
         // Recover files after a page refresh, or when the service comes back.
         if (up && !wasUp) void refreshUploads();
-        if (!up) setUploads([]);
+        if (!up) {
+          setUploads([]);
+          setArchiveDays([]);
+        }
         wasUp = up;
       } catch {
         if (!active) return;
@@ -55,5 +61,5 @@ export function useBackend() {
     };
   }, [refreshUploads]);
 
-  return { service, setService, uploads, setUploads, refreshUploads };
+  return { service, setService, uploads, setUploads, archiveDays, refreshUploads };
 }

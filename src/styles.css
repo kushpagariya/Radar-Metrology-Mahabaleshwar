@@ -3690,3 +3690,190 @@ select:focus-visible {
     font-size: clamp(44px, 6.4vw, 66px);
   }
 }
+
+/* Observed archive (MBL-RADAR) */
+.data-badge.observed {
+  background: #e3eef0;
+  border-color: #c3dadd;
+  color: #1f5960;
+}
+.dataset-time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: auto;
+  font:
+    500 15px 'Manrope',
+    sans-serif;
+  color: #243f3e;
+  font-variant-numeric: tabular-nums;
+}
+.dataset-time small {
+  font:
+    400 11px 'DM Sans',
+    sans-serif;
+  color: #677772;
+}
+.dataset-time + .data-badge {
+  margin-left: 14px;
+}
+.day-strip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px 10px;
+  border-top: 1px solid #e6ebdf;
+}
+.day-strip-body {
+  flex: 1;
+  min-width: 0;
+}
+.day-strip-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+  color: #677772;
+  margin-bottom: 4px;
+}
+.day-strip-head strong {
+  font:
+    500 13px 'DM Sans',
+    sans-serif;
+  color: #243f3e;
+  font-variant-numeric: tabular-nums;
+}
+.day-strip-head strong span {
+  font-weight: 400;
+  color: #677772;
+}
+.day-strip svg {
+  display: block;
+  width: 100%;
+  height: 72px;
+  cursor: pointer;
+  font:
+    10px 'DM Sans',
+    sans-serif;
+  fill: #677772;
+}
+.day-strip svg:focus-visible {
+  outline: 2px solid #257e87;
+  outline-offset: 2px;
+}
+.day-strip .strip-axis {
+  stroke: #cfd8cc;
+}
+.day-strip .strip-cursor {
+  stroke: #1e3f3f;
+  stroke-width: 1.5;
+}
+.mini-chart .cursor {
+  stroke: #236269;
+  stroke-dasharray: 2 3;
+}
+.archive-section {
+  margin-bottom: 28px;
+}
+.archive-hint {
+  font-size: 11px;
+  color: #677772;
+}
+.archive-hint code,
+.methods-layout code {
+  font-size: 0.92em;
+  background: #eef2ec;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.archive-days {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.archive-day {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #dfe6d9;
+  border-radius: 6px;
+  background: #fbfcf9;
+}
+.archive-day header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #236269;
+}
+.archive-day header div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.archive-day header strong {
+  font:
+    500 16px 'Manrope',
+    sans-serif;
+  color: #243f3e;
+}
+.archive-day header span:not(.data-badge) {
+  font-size: 11px;
+  color: #677772;
+}
+.archive-day dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+  margin: 0;
+}
+.archive-day dt {
+  font-size: 10px;
+  color: #677772;
+  margin-bottom: 2px;
+}
+.archive-day dd {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #243f3e;
+  font-variant-numeric: tabular-nums;
+}
+.archive-day dd i {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+.archive-day .btn {
+  align-self: flex-start;
+}
+@media (max-width: 700px) {
+  .dataset-time {
+    display: none;
+  }
+  .day-strip {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  .day-strip-head > span {
+    display: none;
+  }
+}
+.day-strip svg {
+  height: 54px;
+}
+.day-strip-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2px;
+  font-size: 10px;
+  color: #677772;
+  font-variant-numeric: tabular-nums;
+}
+.day-strip-head strong,
+.dataset-time {
+  white-space: nowrap;
+}

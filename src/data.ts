@@ -283,3 +283,78 @@ export function accumulate(scans: Scan[], a: number, b: number, maxGapMinutes = 
     periodHours: (times[times.length - 1] - times[0]) / 3600000,
   };
 }
+
+/* ---------- Processed MBL-RADAR archive (backend/pipeline.py) ---------- */
+
+export type VolumeStats = {
+  max_dbz: number | null;
+  valid_bins: number;
+  area_20_km2: number;
+  area_35_km2: number;
+  area_45_km2: number;
+  mean_rate_mm_hr: number;
+  azimuth_coverage: number;
+};
+export type ArchiveVolume = {
+  index: number;
+  name: string;
+  start: string;
+  end: string;
+  volume_number: number;
+  rays_per_sweep: number[];
+  fixed_angles: number[];
+  fields: string[];
+  stats: VolumeStats;
+  issues: string[];
+};
+export type ArchiveSite = {
+  name: string;
+  latitude: number;
+  longitude: number;
+  altitude_m: number;
+  beamwidth_deg: number;
+  frequency_ghz: number;
+};
+export type ArchiveGap = { after: string; before: string; minutes: number; missing_volumes: number };
+export type ArchiveDaySummary = {
+  date: string;
+  site: ArchiveSite;
+  volume_count: number;
+  expected_volumes: number;
+  gaps: ArchiveGap[];
+  fixed_angles: number[];
+  profile_deviations: string[];
+  pipeline: string;
+  summary: { peak_dbz: number | null; max_area_35_km2: number; raw_megabytes: number };
+};
+export type ArchiveCatalog = ArchiveDaySummary & {
+  fields: string[];
+  scan_name: string;
+  failures: { name: string; error: string }[];
+  product: { grid: string; qc: Record<string, unknown>; encoding: string };
+  volumes: ArchiveVolume[];
+};
+
+export const DBZ_FIELDS: Record<string, string> = {
+  DBZ: 'DBZ · filtered reflectivity',
+  DBZ_TOT: 'DBZ_TOT · unfiltered',
+  DBZV: 'DBZV · vertical channel',
+  DBZE: 'DBZE · enhanced',
+};
+
+/** "12:00 UTC" from an ISO timestamp. */
+export function utcClock(iso: string) {
+  return new Date(iso).toISOString().slice(11, 16);
+}
+/** India Standard Time (UTC+05:30) clock for the same instant. */
+export function istClock(iso: string) {
+  return new Date(Date.parse(iso) + 5.5 * 3600000).toISOString().slice(11, 16);
+}
+export function formatDay(date: string) {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+}

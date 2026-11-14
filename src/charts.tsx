@@ -14,6 +14,7 @@ export function CrossSection({
   transform,
   units,
   pinRange,
+  beamwidth = BEAMWIDTH_DEG,
   canvasRef,
 }: {
   sweeps: Scan[];
@@ -24,6 +25,7 @@ export function CrossSection({
   transform: (v: number) => number;
   units: string;
   pinRange?: number | null;
+  beamwidth?: number;
   canvasRef?: React.RefObject<HTMLCanvasElement | null>;
 }) {
   const own = useRef<HTMLCanvasElement>(null),
@@ -31,10 +33,7 @@ export function CrossSection({
   const [probe, setProbe] = useState<{ r: number; h: number; v: number | null; el: number } | null>(null);
   const topKm = Math.min(
     16,
-    Math.max(
-      4,
-      Math.ceil(Math.max(...sweeps.map((s) => beamHeight(range, s.elevation + BEAMWIDTH_DEG / 2)))),
-    ),
+    Math.max(4, Math.ceil(Math.max(...sweeps.map((s) => beamHeight(range, s.elevation + beamwidth / 2))))),
   );
   const pad = { l: 52, r: 18, t: 18, b: 64 };
 
@@ -75,12 +74,13 @@ export function CrossSection({
         ctx.fillText(formatDistance(r), X(r), h - pad.b + 18);
       }
 
+      const placed: [number, number][] = [];
       for (const s of sweeps) {
         const idx = nearestGate(s, { az: azimuth, range: s.ranges[0] });
         if (!idx) continue;
         const row = s.values[idx.ai];
-        const lo = s.elevation - BEAMWIDTH_DEG / 2,
-          hi = s.elevation + BEAMWIDTH_DEG / 2;
+        const lo = s.elevation - beamwidth / 2,
+          hi = s.elevation + beamwidth / 2;
         s.ranges.forEach((r, ri) => {
           const v = row[ri];
           if (v == null || r > range) return;
@@ -109,8 +109,20 @@ export function CrossSection({
         ctx.setLineDash([]);
         ctx.fillStyle = '#35514d';
         ctx.textAlign = 'left';
-        const labelY = Math.max(pad.t + 10, Y(beamHeight(range, s.elevation)) - 4);
-        ctx.fillText(`${s.elevation.toFixed(1)}°`, w - pad.r - 30, labelY);
+        // Label where the beam centre leaves the plot (right edge or top), skipping overlaps.
+        const hEnd = beamHeight(range, s.elevation);
+        let lx = w - pad.r - 30,
+          ly = Y(hEnd) - 4;
+        if (hEnd > topKm) {
+          let r = range;
+          while (r > 0 && beamHeight(r, s.elevation) > topKm) r -= range / 200;
+          lx = Math.min(w - pad.r - 30, X(r) + 4);
+          ly = pad.t + 10;
+        }
+        if (!placed.some(([px, py]) => Math.abs(px - lx) < 30 && Math.abs(py - ly) < 12)) {
+          ctx.fillText(`${s.elevation.toFixed(1)}°`, lx, ly);
+          placed.push([lx, ly]);
+        }
       }
       if (pinRange != null && pinRange <= range) {
         ctx.strokeStyle = '#1e3f3f';
@@ -131,7 +143,7 @@ export function CrossSection({
     observer.observe(canvas);
     draw();
     return () => observer.disconnect();
-  }, [sweeps, azimuth, range, min, max, transform, topKm, pinRange, ref]);
+  }, [sweeps, azimuth, range, min, max, transform, topKm, pinRange, ref, beamwidth]);
 
   function move(e: React.PointerEvent<HTMLCanvasElement>) {
     const box = e.currentTarget.getBoundingClientRect();
@@ -142,8 +154,8 @@ export function CrossSection({
     if (r < 0 || r > range || km < 0) return setProbe(null);
     for (const s of sweeps) {
       if (
-        km >= beamHeight(r, s.elevation - BEAMWIDTH_DEG / 2) &&
-        km <= beamHeight(r, s.elevation + BEAMWIDTH_DEG / 2)
+        km >= beamHeight(r, s.elevation - beamwidth / 2) &&
+        km <= beamHeight(r, s.elevation + beamwidth / 2)
       ) {
         const idx = nearestGate(s, { az: azimuth, range: r });
         const raw = idx ? s.values[idx.ai][idx.ri] : null;
@@ -164,7 +176,13 @@ export function CrossSection({
       <div className="plot-readout" aria-live="polite">
         {probe ? (
           <>
-            <span>{probe.v === null ? 'Between beams · no sample' : `${probe.v.toFixed(1)} ${units}`}</span>
+            <span>
+              {probe.v !== null
+                ? `${probe.v.toFixed(1)} ${units}`
+                : Number.isFinite(probe.el)
+                  ? 'No echo'
+                  : 'Between beams · not sampled'}
+            </span>
             <span>
               {probe.r.toFixed(1)} km · {probe.h.toFixed(2)} km height
               {Number.isFinite(probe.el) && ` · ${probe.el.toFixed(1)}° sweep`}
@@ -175,7 +193,9 @@ export function CrossSection({
             <span>
               Azimuth {azimuth.toFixed(1)}° · {sweeps.length} sweep{sweeps.length === 1 ? '' : 's'}
             </span>
-            <span>4/3 Earth beam model · {BEAMWIDTH_DEG}° assumed beamwidth</span>
+            <span>
+              4/3 Earth beam model · {beamwidth}° {beamwidth === BEAMWIDTH_DEG ? 'assumed' : 'file'} beamwidth
+            </span>
           </>
         )}
       </div>
@@ -216,7 +236,11 @@ export function TimeSeries({
       className="mini-chart"
       viewBox={`0 0 ${W} ${H}`}
       role="img"
-      aria-label={`Values at the pinned gate: ${points.map((p) => `${p.label} ${p.value === null ? 'no data' : p.value.toFixed(1) + ' ' + units}`).join(', ')}`}
+      aria-label={
+        points.length > 24
+          ? `Values at the pinned gate for ${points.length} times; peak ${Math.max(...vals, 0).toFixed(1)} ${units}`
+          : `Values at the pinned gate: ${points.map((p) => `${p.label} ${p.value === null ? 'no data' : p.value.toFixed(1) + ' ' + units}`).join(', ')}`
+      }
     >
       {[0, 0.5, 1].map((f) => (
         <g key={f}>
@@ -229,22 +253,37 @@ export function TimeSeries({
       {segments.map((d, i) => (
         <path key={i} d={d} className="line" />
       ))}
-      {points.map((p, i) => (
-        <g key={p.label} onClick={() => onSelect?.(i)} className={onSelect ? 'clickable' : undefined}>
-          <rect x={X(i) - 14} y={pad.t} width={28} height={H - pad.t - pad.b} fill="transparent" />
-          {p.value !== null && (
-            <circle
-              cx={X(i)}
-              cy={Y(p.value)}
-              r={i === current ? 4.5 : 3}
-              className={i === current ? 'dot current' : 'dot'}
-            />
-          )}
-          <text x={X(i)} y={H - 6} textAnchor="middle" className={i === current ? 'current' : ''}>
-            {p.label}
-          </text>
-        </g>
-      ))}
+      {points.map((p, i) => {
+        const dense = points.length > 24;
+        const step = Math.ceil(points.length / 6);
+        const slot = (W - pad.l - pad.r) / Math.max(1, points.length - 1);
+        return (
+          <g key={i} onClick={() => onSelect?.(i)} className={onSelect ? 'clickable' : undefined}>
+            <rect x={X(i) - slot / 2} y={pad.t} width={slot} height={H - pad.t - pad.b} fill="transparent" />
+            {p.value !== null && (!dense || i === current) && (
+              <circle
+                cx={X(i)}
+                cy={Y(p.value)}
+                r={i === current ? 4.5 : 3}
+                className={i === current ? 'dot current' : 'dot'}
+              />
+            )}
+            {(!dense || i % step === 0) && (
+              <text
+                x={X(i)}
+                y={H - 6}
+                textAnchor="middle"
+                className={i === current && !dense ? 'current' : ''}
+              >
+                {p.label}
+              </text>
+            )}
+          </g>
+        );
+      })}
+      {points.length > 24 && points[current] && (
+        <line x1={X(current)} x2={X(current)} y1={pad.t} y2={H - pad.b} className="cursor" />
+      )}
     </svg>
   );
 }

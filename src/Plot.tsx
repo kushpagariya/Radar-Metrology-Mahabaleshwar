@@ -22,18 +22,19 @@ type Props = {
   canvasRef?: React.RefObject<HTMLCanvasElement | null>;
 };
 
-/**
- * Approximate offsets (km east, km north) from the demonstration reference location.
- * Schematic context only; not a surveyed basemap.
- */
+/** Approximate town coordinates (°N, °E) for schematic context only; not a surveyed basemap. */
 const PLACES: [string, number, number][] = [
-  ['Mahabaleshwar', 6, -4],
-  ['Pune', 28, 66],
-  ['Satara', 42, -27],
-  ['Wai', 24, 6],
-  ['Mahad', -22, 18],
-  ['Konkan coast', -66, -30],
+  ['Mahabaleshwar', 17.9237, 73.6586],
+  ['Pune', 18.5204, 73.8567],
+  ['Satara', 17.6805, 74.0183],
+  ['Wai', 17.9524, 73.8916],
+  ['Mahad', 18.0836, 73.4166],
+  ['Ratnagiri', 16.9902, 73.312],
+  ['Kolhapur', 16.705, 74.2433],
 ];
+/** Equirectangular offset in km (east, north) from the radar; adequate within ~200 km. */
+const offsetKm = (lat0: number, lon0: number, lat: number, lon: number) =>
+  [(lon - lon0) * 111.32 * Math.cos((lat0 * Math.PI) / 180), (lat - lat0) * 110.57] as const;
 
 const identity = (v: number) => v;
 
@@ -213,8 +214,9 @@ export default function Plot({
         ctx.fillText('W', cx - radius - 18, cy + 4);
         ctx.fillText('E', cx + radius + 18, cy + 4);
         ctx.textAlign = 'left';
-        if (map && scan.synthetic) {
-          PLACES.forEach(([name, east, north]) => {
+        if (map && Number.isFinite(scan.latitude) && Number.isFinite(scan.longitude)) {
+          PLACES.forEach(([name, lat, lon]) => {
+            const [east, north] = offsetKm(scan.latitude, scan.longitude, lat, lon);
             const [x, y] = km(east, north);
             if (x < -80 || x > w + 10 || y < 0 || y > h + 10) return;
             ctx.fillStyle = '#51625b';

@@ -15,14 +15,35 @@ import {
   X,
 } from 'lucide-react';
 import { Brand } from '../Brand';
-import { demoScan, DEMO_RANGE_KM, differenceScan, rainRate, TIMES, type Scan } from '../data';
+import {
+  DEMO_ELEVATIONS,
+  demoScan,
+  DEMO_RANGE_KM,
+  formatDay,
+  istClock,
+  rainRate,
+  TIMES,
+  utcClock,
+  type ArchiveCatalog,
+  type Scan,
+} from '../data';
 import ControlPanel from './ControlPanel';
 import Insights from './Insights';
 import Library from './Library';
 import Methods from './Methods';
-import PlotPanel, { ACCUM_SCALE, DIFF_SCALE, type Accumulation } from './PlotPanel';
+import PlotPanel, { accumScale, DIFF_SCALE } from './PlotPanel';
 import { exportCsv, exportJson, exportPng } from './exporters';
-import { DEFAULTS, pageHash, parseRoute, readState, writeState, type Page, type ViewState } from './state';
+import {
+  dayOf,
+  DEFAULTS,
+  isDay,
+  pageHash,
+  parseRoute,
+  readState,
+  writeState,
+  type Page,
+  type ViewState,
+} from './state';
 import { useBackend, type Uploaded } from './useBackend';
 
 const PAGES: { id: Page; label: string; icon: typeof Radar }[] = [
@@ -44,13 +65,15 @@ export default function Dashboard({ page }: { page: Page }) {
   const [state, setState] = useState<ViewState>(() => readState(parseRoute(window.location.hash).params));
   const set = useCallback((patch: Partial<ViewState>) => setState((s) => ({ ...s, ...patch })), []);
   const [playing, setPlaying] = useState(false);
-  const { service, setService, uploads, setUploads } = useBackend();
+  const { service, setService, uploads, setUploads, archiveDays } = useBackend();
+  const [catalog, setCatalog] = useState<ArchiveCatalog | null>(null);
   const [realScan, setRealScan] = useState<Scan | null>(null);
   const [sourceField, setSourceField] = useState('');
   const [sweep, setSweep] = useState(0);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState('');
-  const [accumulation, setAccumulation] = useState<Accumulation | null>(null);
+  const [override, setOverride] = useState<Scan | null>(null);
+  const [viewBusy, setViewBusy] = useState(false);
   const [sweeps, setSweeps] = useState<Scan[]>([]);
   const canvas = useRef<HTMLCanvasElement>(null),
     fileInput = useRef<HTMLInputElement>(null),
@@ -58,9 +81,18 @@ export default function Dashboard({ page }: { page: Page }) {
     request = useRef(0);
 
   const demo = state.source === 'demo';
+  const day = isDay(state.source) ? dayOf(state.source) : null;
+  const dayCatalog = day && catalog?.date === day ? catalog : null;
   const currentUpload = uploads.find((u) => u.id === state.source);
-  const scan = demo ? demoScan(state.time, state.elevation) : realScan;
+  const scan = demo
+    ? demoScan(
+        Math.min(state.time, TIMES.length - 1),
+        DEMO_ELEVATIONS.includes(state.elevation) ? state.elevation : 0.5,
+      )
+    : realScan;
   const activeRange = demo ? DEMO_RANGE_KM : scan?.ranges.at(-1) || state.range;
+  const sweepIndex = dayCatalog ? Math.max(0, dayCatalog.fixed_angles.indexOf(state.elevation)) : sweep;
+  const dayField = sourceField || 'DBZ';
 
   const transform = useMemo(
     () => (state.field === 'rainfall' ? (v: number) => rainRate(v, state.a, state.b) : (v: number) => v),
@@ -74,12 +106,45 @@ export default function Dashboard({ page }: { page: Page }) {
     if (window.location.hash !== hash) history.replaceState(null, '', hash);
   }, [state, page]);
 
-  // Playback through the demonstration sequence.
+  // Playback through the demonstration sequence or an archive day (waits for each frame to load).
+  const frames = demo ? TIMES.length : (dayCatalog?.volumes.length ?? 0);
   useEffect(() => {
-    if (!playing || !demo) return;
-    const timer = setInterval(() => setState((s) => ({ ...s, time: (s.time + 1) % TIMES.length })), 1100);
-    return () => clearInterval(timer);
-  }, [playing, demo]);
+    if (!playing || !frames || busy || viewBusy) return;
+    const timer = setTimeout(
+      () => setState((s) => ({ ...s, time: (s.time + 1) % frames })),
+      demo ? 1100 : 600,
+    );
+    return () => clearTimeout(timer);
+  }, [playing, frames, demo, busy, viewBusy, state.time]);
+
+  // Keep indices valid for the current source.
+  useEffect(() => {
+    if (demo && !DEMO_ELEVATIONS.includes(state.elevation)) set({ elevation: 0.5 });
+    if (demo && state.time >= TIMES.length) set({ time: DEFAULTS.time });
+    if (dayCatalog) {
+      const n = dayCatalog.volumes.length;
+      if (state.time >= n) set({ time: n - 1 });
+      if (!dayCatalog.fixed_angles.includes(state.elevation)) set({ elevation: dayCatalog.fixed_angles[0] });
+    }
+  }, [demo, dayCatalog, state.time, state.elevation, set]);
+
+  // Load the catalog of an archive day.
+  useEffect(() => {
+    if (!day || catalog?.date === day) return;
+    const controller = new AbortController();
+    fetch(`/api/archive/${day}`, { signal: controller.signal })
+      .then(async (r) => {
+        if (!r.ok) throw new Error((await r.json()).detail || 'This archive day is unavailable.');
+        return r.json();
+      })
+      .then(setCatalog)
+      .catch((e) => {
+        if (e.name === 'AbortError') return;
+        setNotice(`${e.message} Showing the demonstration volume.`);
+        set({ source: 'demo', time: DEFAULTS.time, elevation: 0.5, range: DEMO_RANGE_KM });
+      });
+    return () => controller.abort();
+  }, [day, catalog?.date, set]);
 
   // Recover an uploaded source named in the URL once the file list arrives.
   useEffect(() => {
@@ -88,7 +153,7 @@ export default function Dashboard({ page }: { page: Page }) {
 
   // Fall back to the demonstration if a linked upload no longer exists on the backend.
   useEffect(() => {
-    if (demo || !service) return;
+    if (demo || day || !service) return;
     const t = setTimeout(() => {
       if (!uploads.some((u) => u.id === state.source)) {
         set({ source: 'demo', range: DEMO_RANGE_KM });
@@ -98,18 +163,26 @@ export default function Dashboard({ page }: { page: Page }) {
       }
     }, 1500);
     return () => clearTimeout(t);
-  }, [demo, service, uploads, state.source, set]);
+  }, [demo, day, service, uploads, state.source, set]);
 
-  // Read the selected sweep from an uploaded file.
+  // Read the selected sweep from an uploaded file or an archive volume.
+  const scanUrl = demo
+    ? null
+    : day
+      ? dayCatalog && state.time < dayCatalog.volumes.length
+        ? `/api/archive/${day}/volumes/${state.time}/sweep?field=${dayField}&sweep=${sweepIndex}`
+        : null
+      : sourceField
+        ? `/api/files/${state.source}/scan?field=${encodeURIComponent(sourceField)}&sweep=${sweep}`
+        : null;
   useEffect(() => {
-    if (demo || !sourceField) return;
+    if (!scanUrl) return;
     const controller = new AbortController();
     const n = ++request.current;
     setBusy(true);
-    setRealScan(null);
-    fetch(`/api/files/${state.source}/scan?field=${encodeURIComponent(sourceField)}&sweep=${sweep}`, {
-      signal: controller.signal,
-    })
+    // Keep the previous frame on screen during archive playback; clear it for a new file.
+    if (!day) setRealScan(null);
+    fetch(scanUrl, { signal: controller.signal })
       .then(async (r) => {
         if (!r.ok) throw new Error((await r.json()).detail || 'Unable to read this scan.');
         return r.json();
@@ -127,7 +200,7 @@ export default function Dashboard({ page }: { page: Page }) {
         if (n === request.current) setBusy(false);
       });
     return () => controller.abort();
-  }, [demo, state.source, sourceField, sweep]);
+  }, [scanUrl, day]);
 
   const goTo = useCallback(
     (p: Page) => {
@@ -138,10 +211,41 @@ export default function Dashboard({ page }: { page: Page }) {
     [state],
   );
 
-  function selectDemo(time = state.time) {
+  function selectDemo(time = DEFAULTS.time) {
     setRealScan(null);
     setSourceField('');
-    set({ source: 'demo', time, range: DEMO_RANGE_KM });
+    set({ source: 'demo', time, elevation: 0.5, range: DEMO_RANGE_KM });
+  }
+
+  /** Opens an archive day on its busiest volume so the first view shows weather. */
+  async function openDay(date: string) {
+    try {
+      const r = await fetch(`/api/archive/${date}`);
+      if (!r.ok) throw new Error();
+      const c: ArchiveCatalog = await r.json();
+      const busiest = c.volumes.reduce(
+        (best, v, i) => (v.stats.area_35_km2 > c.volumes[best].stats.area_35_km2 ? i : best),
+        0,
+      );
+      setRealScan(null);
+      setSourceField('DBZ');
+      setPlaying(false);
+      setCatalog(c);
+      const next: ViewState = {
+        ...state,
+        source: `day:${date}`,
+        time: busiest,
+        compareTime: Math.max(0, busiest - 3),
+        elevation: c.fixed_angles[0],
+        view: 'ppi',
+        pin: null,
+        range: 120,
+      };
+      setState(next);
+      window.location.hash = pageHash('workspace', writeState(next));
+    } catch {
+      setNotice('This archive day could not be loaded.');
+    }
   }
 
   function resetSettings() {
@@ -208,13 +312,7 @@ export default function Dashboard({ page }: { page: Page }) {
     }
   }
 
-  const displayed = useMemo(() => {
-    if (!scan) return null;
-    if (state.view === 'accum' && accumulation) return accumulation.scan;
-    if (state.view === 'compare' && state.compareMode === 'diff' && demo)
-      return differenceScan(demoScan(state.compareTime, state.elevation), scan) ?? scan;
-    return scan;
-  }, [scan, state.view, state.compareMode, state.compareTime, state.elevation, accumulation, demo]);
+  const displayed = override ?? scan;
 
   function exportData(format: 'png' | 'json' | 'csv') {
     if (!scan || !displayed) return;
@@ -228,7 +326,7 @@ export default function Dashboard({ page }: { page: Page }) {
       sweeps,
       transform,
       units: isDiff ? 'ΔdBZ' : isAccum ? 'mm' : units,
-      scale: isDiff ? DIFF_SCALE : isAccum ? ACCUM_SCALE : { min: state.min, max: state.max },
+      scale: isDiff ? DIFF_SCALE : isAccum ? accumScale(displayed) : { min: state.min, max: state.max },
       canvas: canvas.current,
     };
     if (format === 'png') exportPng(ctx);
@@ -256,7 +354,9 @@ export default function Dashboard({ page }: { page: Page }) {
             >
               <Icon size={18} strokeWidth={1.5} />
               {label}
-              {id === 'library' && <span className="nav-count">{TIMES.length + uploads.length}</span>}
+              {id === 'library' && (
+                <span className="nav-count">{TIMES.length + uploads.length + archiveDays.length}</span>
+              )}
             </button>
           ))}
         </nav>
@@ -364,16 +464,36 @@ export default function Dashboard({ page }: { page: Page }) {
                 </div>
                 <div>
                   <strong>
-                    {demo ? 'Western Ghats · demonstration volume' : (currentUpload?.name ?? 'Uploaded file')}
+                    {demo
+                      ? 'Western Ghats · demonstration volume'
+                      : dayCatalog
+                        ? `${dayCatalog.site.name} · Mahabaleshwar · ${formatDay(dayCatalog.date)}`
+                        : day
+                          ? 'Loading archive day…'
+                          : (currentUpload?.name ?? 'Uploaded file')}
                   </strong>
                   <span>
                     {demo
                       ? '15 July 2026 · 6 scans × 4 elevations · synthetic reflectivity'
-                      : 'Uploaded NetCDF · local session · original file preserved'}
+                      : dayCatalog
+                        ? `${dayCatalog.volume_count} volumes × ${dayCatalog.fixed_angles.length} sweeps · X-band ${dayCatalog.site.frequency_ghz.toFixed(2)} GHz dual-pol · ${dayCatalog.site.latitude.toFixed(3)}° N, ${dayCatalog.site.longitude.toFixed(3)}° E, ${Math.round(dayCatalog.site.altitude_m)} m${dayCatalog.gaps.length ? ` · ${dayCatalog.gaps.reduce((n, g) => n + g.missing_volumes, 0)} missing` : ''}`
+                        : 'Uploaded NetCDF · local session · original file preserved'}
                   </span>
                 </div>
-                <span className={`data-badge ${demo ? '' : 'uploaded'}`}>
-                  {demo ? 'Synthetic data' : 'Uploaded file'}
+                {dayCatalog && scan && (
+                  <span className="dataset-time">
+                    {utcClock(dayCatalog.volumes[Math.min(state.time, dayCatalog.volumes.length - 1)].start)}{' '}
+                    UTC
+                    <small>
+                      {istClock(
+                        dayCatalog.volumes[Math.min(state.time, dayCatalog.volumes.length - 1)].start,
+                      )}{' '}
+                      IST
+                    </small>
+                  </span>
+                )}
+                <span className={`data-badge ${demo ? '' : day ? 'observed' : 'uploaded'}`}>
+                  {demo ? 'Synthetic data' : day ? 'Observed data' : 'Uploaded file'}
                 </span>
                 <button className="text-button" onClick={() => goTo('library')}>
                   Change dataset <ArrowRight size={14} />
@@ -385,7 +505,8 @@ export default function Dashboard({ page }: { page: Page }) {
                   set={set}
                   scan={scan}
                   upload={currentUpload}
-                  sourceField={sourceField}
+                  catalog={dayCatalog}
+                  sourceField={day ? dayField : sourceField}
                   setSourceField={setSourceField}
                   sweep={sweep}
                   setSweep={setSweep}
@@ -397,7 +518,8 @@ export default function Dashboard({ page }: { page: Page }) {
                   set={set}
                   scan={scan}
                   upload={currentUpload}
-                  sourceField={sourceField}
+                  catalog={dayCatalog}
+                  sourceField={day ? dayField : sourceField}
                   busy={busy}
                   service={service}
                   transform={transform}
@@ -407,11 +529,19 @@ export default function Dashboard({ page }: { page: Page }) {
                   onUseDemo={() => selectDemo()}
                   onMethods={() => goTo('methods')}
                   canvasRef={canvas}
-                  onAccumulation={setAccumulation}
+                  onDisplayed={setOverride}
+                  onBusy={setViewBusy}
                   onSweeps={setSweeps}
                 />
               </div>
-              <Insights state={state} set={set} scan={scan} transform={transform} units={units} />
+              <Insights
+                state={state}
+                set={set}
+                scan={scan}
+                transform={transform}
+                units={units}
+                catalog={dayCatalog}
+              />
               <p className="workspace-footnote">
                 {state.view === 'map'
                   ? 'Regional context is schematic; place markers are approximate. Uploaded scans use source site metadata. '
@@ -426,6 +556,8 @@ export default function Dashboard({ page }: { page: Page }) {
           )}
           {page === 'library' && (
             <Library
+              archiveDays={archiveDays}
+              onOpenDay={(d) => void openDay(d)}
               uploads={uploads}
               busy={busy}
               service={service}
@@ -436,13 +568,13 @@ export default function Dashboard({ page }: { page: Page }) {
               onOpenDemo={(t) => {
                 setRealScan(null);
                 setSourceField('');
-                const next = { ...state, source: 'demo', time: t, range: DEMO_RANGE_KM };
+                const next = { ...state, source: 'demo', time: t, elevation: 0.5, range: DEMO_RANGE_KM };
                 setState(next);
                 window.location.hash = pageHash('workspace', writeState(next));
               }}
             />
           )}
-          {page === 'methods' && <Methods service={service} />}
+          {page === 'methods' && <Methods service={service} archiveDays={archiveDays} />}
         </main>
         <footer className="workspace-footer">
           <span>Radar Metrology · Mahabaleshwar</span>

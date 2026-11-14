@@ -1,11 +1,23 @@
 import { useState } from 'react';
-import { ArrowUpRight, Check, Download, FileText, LoaderCircle, Search, Trash2, Upload } from 'lucide-react';
-import { download, TIMES } from '../data';
+import {
+  ArrowUpRight,
+  CalendarDays,
+  Check,
+  Download,
+  FileText,
+  LoaderCircle,
+  Search,
+  Trash2,
+  Upload,
+} from 'lucide-react';
+import { colorFor, download, formatDay, TIMES, type ArchiveDaySummary } from '../data';
 import type { Uploaded } from './useBackend';
 
 const DEMO_FILES = TIMES.map((t, i) => ({ t, i, name: `illustrative_volume_${t.replace(':', '')}.nc` }));
 
 export default function Library({
+  archiveDays,
+  onOpenDay,
   uploads,
   busy,
   service,
@@ -15,6 +27,8 @@ export default function Library({
   onRemoveUpload,
   onOpenDemo,
 }: {
+  archiveDays: ArchiveDaySummary[];
+  onOpenDay: (date: string) => void;
   uploads: Uploaded[];
   busy: boolean;
   service: boolean;
@@ -32,6 +46,76 @@ export default function Library({
 
   return (
     <>
+      <section className="archive-section" aria-labelledby="archive-title">
+        <div className="library-heading">
+          <h2 id="archive-title">
+            Radar archive <span>{archiveDays.length}</span>
+          </h2>
+          <span className="archive-hint">
+            Processed with <code>python -m backend.pipeline ingest</code>
+          </span>
+        </div>
+        {archiveDays.length ? (
+          <div className="archive-days">
+            {archiveDays.map((d) => {
+              const missing = d.gaps.reduce((n, g) => n + g.missing_volumes, 0);
+              return (
+                <article key={d.date} className="archive-day">
+                  <header>
+                    <CalendarDays size={17} />
+                    <div>
+                      <strong>{formatDay(d.date)}</strong>
+                      <span>
+                        {d.site.name} · {d.volume_count}/{d.expected_volumes} volumes
+                      </span>
+                    </div>
+                    <span className="data-badge observed">Observed</span>
+                  </header>
+                  <dl>
+                    <div>
+                      <dt>Peak</dt>
+                      <dd>
+                        <i
+                          style={{
+                            background:
+                              d.summary.peak_dbz === null ? '#dce2dc' : colorFor(d.summary.peak_dbz),
+                          }}
+                        />
+                        {d.summary.peak_dbz ?? '—'} dBZ
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Largest area ≥ 35 dBZ</dt>
+                      <dd>{Math.round(d.summary.max_area_35_km2).toLocaleString()} km²</dd>
+                    </div>
+                    <div>
+                      <dt>Gaps</dt>
+                      <dd>{missing ? `${missing} missing volume${missing === 1 ? '' : 's'}` : 'Complete'}</dd>
+                    </div>
+                    <div>
+                      <dt>Profile</dt>
+                      <dd>
+                        {d.profile_deviations.length
+                          ? `${d.profile_deviations.length} deviation(s)`
+                          : 'Matches MBL scan'}
+                      </dd>
+                    </div>
+                  </dl>
+                  <button className="btn btn-outline" onClick={() => onOpenDay(d.date)}>
+                    Explore day <ArrowUpRight size={14} />
+                  </button>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="insight-empty">
+            {service
+              ? 'No processed days yet. Run the pipeline on a zip or folder of CfRadial volumes, then refresh.'
+              : 'Start the Python service to browse processed radar days.'}
+          </p>
+        )}
+      </section>
       <div
         className={`library-import ${dragging ? 'dragging' : ''}`}
         onDragOver={(e) => {

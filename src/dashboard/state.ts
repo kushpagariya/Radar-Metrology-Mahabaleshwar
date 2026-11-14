@@ -1,4 +1,4 @@
-import { DEMO_ELEVATIONS, DEMO_RANGE_KM, TIMES, ZR_PRESETS, type Field, type Gate } from '../data';
+import { DEMO_RANGE_KM, ZR_PRESETS, type Field, type Gate } from '../data';
 
 export type Page = 'workspace' | 'library' | 'methods';
 export type View = 'ppi' | 'map' | 'section' | 'compare' | 'accum';
@@ -21,6 +21,8 @@ export type ViewState = {
   pin: Gate | null;
   compareTime: number;
   compareMode: 'side' | 'diff';
+  /** Accumulation window in hours, ending at the selected volume (archive days only). */
+  win: number;
 };
 
 export const DEFAULTS: ViewState = {
@@ -40,6 +42,7 @@ export const DEFAULTS: ViewState = {
   pin: null,
   compareTime: 0,
   compareMode: 'side',
+  win: 24,
 };
 
 export function parseRoute(hash: string): { page: Page; params: URLSearchParams } {
@@ -68,8 +71,9 @@ export function readState(params: URLSearchParams): ViewState {
   const min = num(params.get('min'), 0, -40, 499);
   return {
     source: params.get('src') || 'demo',
-    time: Math.round(num(params.get('t'), DEFAULTS.time, 0, TIMES.length - 1)),
-    elevation: DEMO_ELEVATIONS.includes(elevation) ? elevation : 0.5,
+    // Upper bounds depend on the source; the dashboard clamps once the source is known.
+    time: Math.round(num(params.get('t'), DEFAULTS.time, 0, 1000)),
+    elevation,
     field,
     range: num(params.get('range'), DEMO_RANGE_KM, 0.1, 2000),
     view,
@@ -82,8 +86,9 @@ export function readState(params: URLSearchParams): ViewState {
     threshold: params.has('thr') ? num(params.get('thr'), 40, -20, 80) : null,
     pin:
       pinAz !== null && pinR !== null ? { az: num(pinAz, 0, 0, 360), range: num(pinR, 10, 0, 2000) } : null,
-    compareTime: Math.round(num(params.get('ct'), 0, 0, TIMES.length - 1)),
+    compareTime: Math.round(num(params.get('ct'), 0, 0, 1000)),
     compareMode: params.get('cm') === 'diff' ? 'diff' : 'side',
+    win: [1, 3, 6, 24].includes(Number(params.get('win'))) ? Number(params.get('win')) : 24,
   };
 }
 
@@ -106,6 +111,7 @@ export function writeState(s: ViewState) {
     p.set('b', String(s.b));
   }
   if (s.threshold !== null) p.set('thr', String(s.threshold));
+  if (s.view === 'accum' && s.win !== 24) p.set('win', String(s.win));
   if (s.pin) {
     p.set('az', String(s.pin.az));
     p.set('rg', String(s.pin.range));
@@ -121,3 +127,6 @@ export function pageHash(page: Page, query: string) {
   const path = page === 'workspace' ? '#/dashboard' : `#/dashboard/${page}`;
   return query ? `${path}?${query}` : path;
 }
+
+export const isDay = (source: string) => source.startsWith('day:');
+export const dayOf = (source: string) => source.slice(4);

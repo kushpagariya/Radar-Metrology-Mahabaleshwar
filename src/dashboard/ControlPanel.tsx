@@ -1,6 +1,17 @@
 import { CircleHelp, SlidersHorizontal } from 'lucide-react';
-import { DEMO_ELEVATIONS, formatDistance, TIMES, ZR_PRESETS, type Field, type Scan } from '../data';
-import type { ViewState } from './state';
+import {
+  DBZ_FIELDS,
+  DEMO_ELEVATIONS,
+  formatDistance,
+  istClock,
+  TIMES,
+  utcClock,
+  ZR_PRESETS,
+  type ArchiveCatalog,
+  type Field,
+  type Scan,
+} from '../data';
+import { isDay, type ViewState } from './state';
 import type { Uploaded } from './useBackend';
 
 type Props = {
@@ -8,6 +19,7 @@ type Props = {
   set: (patch: Partial<ViewState>) => void;
   scan: Scan | null;
   upload: Uploaded | undefined;
+  catalog: ArchiveCatalog | null;
   sourceField: string;
   setSourceField: (v: string) => void;
   sweep: number;
@@ -21,6 +33,7 @@ export default function ControlPanel({
   set,
   scan,
   upload,
+  catalog,
   sourceField,
   setSourceField,
   sweep,
@@ -29,6 +42,7 @@ export default function ControlPanel({
   onReset,
 }: Props) {
   const demo = state.source === 'demo';
+  const day = isDay(state.source) ? catalog : null;
   const preset = ZR_PRESETS.find((p) => p.id === state.zr) ?? ZR_PRESETS[0];
   const showsRain = state.field === 'rainfall' || state.view === 'accum';
   const fixedScale = state.view === 'accum' || (state.view === 'compare' && state.compareMode === 'diff');
@@ -38,7 +52,21 @@ export default function ControlPanel({
         <SlidersHorizontal size={16} />
         <h2>Scan settings</h2>
       </div>
-      {!demo && (
+      {day && (
+        <label>
+          Reflectivity field
+          <select value={sourceField || 'DBZ'} onChange={(e) => setSourceField(e.target.value)}>
+            {day.fields
+              .filter((f) => f in DBZ_FIELDS)
+              .map((f) => (
+                <option key={f} value={f}>
+                  {DBZ_FIELDS[f]}
+                </option>
+              ))}
+          </select>
+        </label>
+      )}
+      {!demo && !day && (
         <>
           <label>
             Source reflectivity
@@ -77,8 +105,18 @@ export default function ControlPanel({
       </label>
       <label>
         Scan time <span className="control-unit">UTC</span>
-        <select value={state.time} disabled={!demo} onChange={(e) => set({ time: Number(e.target.value) })}>
-          {demo ? (
+        <select
+          value={state.time}
+          disabled={!demo && !day}
+          onChange={(e) => set({ time: Number(e.target.value) })}
+        >
+          {day ? (
+            day.volumes.map((v, i) => (
+              <option key={v.index} value={i}>
+                {utcClock(v.start)} UTC · {istClock(v.start)} IST
+              </option>
+            ))
+          ) : demo ? (
             TIMES.map((t, i) => (
               <option key={t} value={i}>
                 {t}:00
@@ -93,10 +131,16 @@ export default function ControlPanel({
         Elevation angle
         <select
           value={state.elevation}
-          disabled={!demo || state.view === 'section'}
+          disabled={(!demo && !day) || state.view === 'section'}
           onChange={(e) => set({ elevation: Number(e.target.value) })}
         >
-          {demo ? (
+          {day ? (
+            day.fixed_angles.map((e) => (
+              <option value={e} key={e}>
+                {e.toFixed(1)}°
+              </option>
+            ))
+          ) : demo ? (
             DEMO_ELEVATIONS.map((e) => (
               <option value={e} key={e}>
                 {e.toFixed(1)}°
@@ -239,7 +283,9 @@ export default function ControlPanel({
         <p>
           {demo
             ? 'These scans demonstrate the workflow. They are not observed weather.'
-            : 'Only supported polar reflectivity fields are shown. Coordinate and unit checks run in Python.'}
+            : day
+              ? 'Observed MBL-RADAR data. Display sweeps are subsampled to 0.9 km gates; X-band attenuation is not corrected.'
+              : 'Only supported polar reflectivity fields are shown. Coordinate and unit checks run in Python.'}
         </p>
       </div>
       <button className="text-button reset-controls" onClick={onReset}>
